@@ -1,0 +1,380 @@
+import { useState, useMemo, useCallback } from 'react';
+import dynamic from 'next/dynamic';
+import AddBusinessModal from '../../components/AddBusinessModal';
+import Layout from '../../components/Layout';
+import PageHeader from '../../components/PageHeader';
+import { useData } from '../../components/DataContext';
+import { districts, statuses } from '../../mockData/businesses';
+import { STATUS_CONFIG, selectCls, inputCls } from '../../components/ui';
+import BusinessProfile from '../../components/BusinessProfile';
+import { EditModal, DeleteConfirm } from '../../components/BusinessModals';
+
+const LeafletMap = dynamic(() => import('../../components/LeafletMap'), { ssr: false });
+
+const STATUS_DOT_COLORS = {
+  client:    'bg-blue-500',
+  agreed:    'bg-emerald-500',
+  contacted: 'bg-amber-400',
+  rejected:  'bg-red-500',
+  untouched: 'bg-gray-400',
+};
+
+function IconPhone() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+    </svg>
+  );
+}
+function IconMail() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+    </svg>
+  );
+}
+function IconClose() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+    </svg>
+  );
+}
+
+function ToolbarBtn({ active, activeClass, onClick, children }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[12px] font-medium border transition-all ${
+        active
+          ? activeClass
+          : 'bg-white border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-700'
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
+
+export default function MapPage() {
+  const { businesses, addBusiness, updateBusiness, deleteBusiness, changeStatus: ctxChangeStatus } = useData();
+  const [selected, setSelected] = useState(null);
+  const [search, setSearch] = useState('');
+  const [filterStatus, setFilterStatus] = useState('');
+  const [filterDistrict, setFilterDistrict] = useState('');
+  const [showUncontacted, setShowUncontacted] = useState(false);
+  const [clusterMode, setClusterMode] = useState(false);
+  const [showDistricts, setShowDistricts] = useState(false);
+
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [pickingLocation, setPickingLocation] = useState(false);
+  const [pendingCoords, setPendingCoords] = useState(null);
+  const [editBiz, setEditBiz] = useState(null);
+  const [deleteBiz, setDeleteBiz] = useState(null);
+  const [relocatingId, setRelocatingId] = useState(null);
+
+  const markers = businesses ?? [];
+  const selectedMarker = markers.find((m) => m.id === selected) ?? null;
+
+  function changeStatus(id, newStatus) {
+    ctxChangeStatus(id, newStatus);
+  }
+
+  function handleMapClick(e) {
+    if (pickingLocation) {
+      setPendingCoords({ lat: e.latlng.lat, lng: e.latlng.lng });
+      setPickingLocation(false);
+      setShowAddModal(true);
+    } else if (relocatingId) {
+      updateBusiness(relocatingId, { lat: e.latlng.lat, lng: e.latlng.lng });
+      setRelocatingId(null);
+    } else {
+      setSelected(null);
+    }
+  }
+
+  function handleRelocate(biz) {
+    setRelocatingId(biz.id);
+  }
+
+  function openAddModal() {
+    setPendingCoords(null);
+    setShowAddModal(true);
+  }
+
+  function handlePickOnMap() {
+    setShowAddModal(false);
+    setPickingLocation(true);
+  }
+
+  function handleAddSubmit({ name, type, district, status, address, phone, email, note, coords }) {
+    const newBiz = addBusiness({
+      name: name.trim(),
+      type: type.trim() || '—',
+      district,
+      status,
+      address: address.trim() || '—',
+      phone: phone.trim() || '—',
+      email: email.trim() || '—',
+      note: note.trim() || '',
+      lat: coords?.lat ?? 52.2297,
+      lng: coords?.lng ?? 21.0122,
+    });
+    setSelected(newBiz.id);
+    setShowAddModal(false);
+    setPendingCoords(null);
+  }
+
+  function toggleUncontacted() {
+    if (!showUncontacted) setFilterStatus('');
+    setShowUncontacted((v) => !v);
+  }
+
+  function handleFilterStatus(val) {
+    setFilterStatus(val);
+    if (val) setShowUncontacted(false);
+    setSelected(null);
+  }
+
+  const filtered = useMemo(() => {
+    let rows = markers;
+    if (showUncontacted) rows = rows.filter((b) => b.status === 'untouched');
+    if (search) {
+      const q = search.toLowerCase();
+      rows = rows.filter((b) => b.name.toLowerCase().includes(q) || b.district.toLowerCase().includes(q) || b.type.toLowerCase().includes(q));
+    }
+    if (filterStatus) rows = rows.filter((b) => b.status === filterStatus);
+    if (filterDistrict) rows = rows.filter((b) => b.district === filterDistrict);
+    return rows;
+  }, [markers, search, filterStatus, filterDistrict, showUncontacted]);
+
+  const counts = statuses.reduce((acc, s) => {
+    acc[s] = markers.filter((m) => m.status === s).length;
+    return acc;
+  }, {});
+
+
+  const hasFilters = search || filterStatus || filterDistrict || showUncontacted;
+
+  function handleEditFromProfile(biz) { setSelected(null); setEditBiz(biz); }
+  function handleDeleteFromProfile(biz) { setSelected(null); setDeleteBiz(biz); }
+  function handleConfirmDelete() {
+    deleteBusiness(deleteBiz.id);
+    setDeleteBiz(null);
+  }
+
+  return (
+    <Layout fullWidth>
+      {showAddModal && (
+        <AddBusinessModal
+          onClose={() => { setShowAddModal(false); setPendingCoords(null); }}
+          onSubmit={handleAddSubmit}
+          onPickOnMap={handlePickOnMap}
+          pendingCoords={pendingCoords}
+        />
+      )}
+      {editBiz   && <EditModal biz={editBiz} onClose={() => setEditBiz(null)} onSave={(changes) => { updateBusiness(editBiz.id, changes); setEditBiz(null); }} />}
+      {deleteBiz && <DeleteConfirm biz={deleteBiz} onClose={() => setDeleteBiz(null)} onConfirm={handleConfirmDelete} />}
+      {selectedMarker && !showAddModal && !editBiz && !deleteBiz && (
+        <BusinessProfile
+          biz={selectedMarker}
+          onClose={() => { setSelected(null); setRelocatingId(null); }}
+          onEdit={handleEditFromProfile}
+          onDelete={handleDeleteFromProfile}
+          onStatusChange={changeStatus}
+          onFollowUpChange={(id, date) => updateBusiness(id, { followUpDate: date || null })}
+          onRelocate={handleRelocate}
+          noBackdrop
+        />
+      )}
+
+      <PageHeader
+        title="Map"
+        count={markers.length}
+
+        subtitle="Businesses across Warsaw by location and status."
+        action={
+          <button
+            onClick={openAddModal}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-900 text-white text-[13px] font-semibold hover:bg-gray-800 transition-all"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            Add Business
+          </button>
+        }
+      />
+
+      {/* Search + filter bar */}
+      <div className="flex items-center gap-2 mb-3">
+        <div className="relative">
+          <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input
+            type="text"
+            placeholder="Search business, district..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-56 pl-8 pr-3 py-[7px] text-[13px] text-gray-700 bg-white border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent placeholder-gray-400 transition hover:border-gray-300"
+          />
+        </div>
+
+        <div className="w-px h-5 bg-gray-200" />
+
+        <select value={filterStatus} onChange={(e) => handleFilterStatus(e.target.value)} className={selectCls}>
+          <option value="">All statuses</option>
+          {statuses.map((s) => <option key={s} value={s}>{STATUS_CONFIG[s].label}</option>)}
+        </select>
+
+        <select value={filterDistrict} onChange={(e) => { setFilterDistrict(e.target.value); setSelected(null); }} className={selectCls}>
+          <option value="">All districts</option>
+          {districts.map((d) => <option key={d} value={d}>{d}</option>)}
+        </select>
+
+        {hasFilters && (
+          <button
+            onClick={() => { setSearch(''); setFilterStatus(''); setFilterDistrict(''); setShowUncontacted(false); }}
+            className="text-[12px] text-gray-400 hover:text-gray-700 flex items-center gap-1 transition-colors"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            Clear
+          </button>
+        )}
+
+        <span className="ml-auto text-[12px] text-gray-400">
+          {filtered.length} of {markers.length} shown
+        </span>
+      </div>
+
+      {/* Toolbar */}
+      <div className="flex items-center gap-1.5 mb-4">
+        <ToolbarBtn
+          active={showUncontacted}
+          activeClass="bg-gray-100 border-gray-300 text-gray-700"
+          onClick={toggleUncontacted}
+        >
+          <span className="w-1.5 h-1.5 rounded-full bg-gray-400 shrink-0" />
+          Untouched only
+        </ToolbarBtn>
+
+        <ToolbarBtn
+          active={clusterMode}
+          activeClass="bg-gray-100 border-gray-300 text-gray-800"
+          onClick={() => setClusterMode((v) => !v)}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <circle cx="12" cy="12" r="3" strokeLinecap="round" />
+            <circle cx="5" cy="5" r="2" strokeLinecap="round" />
+            <circle cx="19" cy="5" r="2" strokeLinecap="round" />
+            <circle cx="5" cy="19" r="2" strokeLinecap="round" />
+            <circle cx="19" cy="19" r="2" strokeLinecap="round" />
+          </svg>
+          Cluster markers
+        </ToolbarBtn>
+
+        <ToolbarBtn
+          active={showDistricts}
+          activeClass="bg-blue-50 border-blue-200 text-blue-700"
+          onClick={() => setShowDistricts((v) => !v)}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+          </svg>
+          Districts
+        </ToolbarBtn>
+
+      </div>
+
+      <div className="flex gap-5">
+
+        {/* Map */}
+        <div className="flex-1 min-w-0">
+          <div
+            className={`relative w-full rounded-2xl border border-gray-200 overflow-hidden shadow-sm ${relocatingId || pickingLocation ? 'map-crosshair' : ''}`}
+            style={{ height: 'calc(100vh - 300px)', minHeight: '520px', maxHeight: '780px' }}
+          >
+            {/* Pick location banner */}
+            {pickingLocation && (
+              <div className="absolute inset-x-0 top-0 z-[1001] flex items-center justify-center gap-3 bg-gray-900/90 text-white text-[12px] font-medium px-4 py-2.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                Click on the map to set the business location
+                <button
+                  onClick={() => { setPickingLocation(false); setShowAddModal(true); }}
+                  className="ml-2 text-white/60 hover:text-white transition-colors underline"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
+
+            {/* Relocate pin banner */}
+            {relocatingId && (
+              <div className="absolute inset-x-0 top-0 z-[1001] flex items-center justify-center gap-3 bg-blue-900/90 text-white text-[12px] font-medium px-4 py-2.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-300 animate-pulse shrink-0" />
+                Click on the map to move the pin to a new location
+                <button
+                  onClick={() => setRelocatingId(null)}
+                  className="ml-2 text-white/60 hover:text-white transition-colors underline"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
+
+            <LeafletMap
+              markers={filtered}
+              selectedId={selected}
+              onMarkerClick={(id) => setSelected((prev) => (prev === id ? null : id))}
+              onMapClick={handleMapClick}
+              cluster={clusterMode}
+              showDistricts={showDistricts}
+            />
+
+            {/* Status legend */}
+            <div className="absolute bottom-4 left-4 z-[1000] bg-white/95 backdrop-blur-sm rounded-xl border border-gray-200/80 px-3.5 py-2.5 shadow-sm pointer-events-none">
+              <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-2">Status</p>
+              <div className="flex flex-col gap-1.5">
+                {statuses.map((s) => (
+                  <div key={s} className="flex items-center gap-2">
+                    <span className={`w-2 h-2 rounded-full shrink-0 ${STATUS_DOT_COLORS[s]}`} />
+                    <span className="text-[11px] text-gray-600">{STATUS_CONFIG[s].label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Marker count */}
+            <div className="absolute top-3.5 left-3.5 z-[1000] bg-white/95 backdrop-blur-sm rounded-lg border border-gray-200/80 px-3 py-1.5 shadow-sm pointer-events-none">
+              <p className="text-[11px] text-gray-500">{filtered.length} locations</p>
+            </div>
+
+          </div>
+        </div>
+
+        {/* Right sidebar */}
+        <div className="w-52 flex flex-col gap-2.5 shrink-0">
+          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1 pt-0.5">Overview</p>
+          {statuses.map((s) => {
+            const cfg = STATUS_CONFIG[s];
+            const count = counts[s];
+            return (
+              <div key={s} className="bg-white rounded-2xl border border-gray-200 px-4 py-3 shadow-sm">
+                <div className="flex items-center gap-1.5 mb-2">
+                  <span className={`w-1.5 h-1.5 rounded-full ${cfg.color}`} />
+                  <p className="text-[11px] text-gray-500 font-medium">{cfg.label}</p>
+                </div>
+                <p className="text-2xl font-bold text-gray-900 leading-none">{count}</p>
+              </div>
+            );
+          })}
+        </div>
+
+      </div>
+    </Layout>
+  );
+}

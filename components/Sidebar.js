@@ -1,0 +1,149 @@
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+
+const navGroups = [
+  {
+    label: 'General',
+    items: [
+      {
+        label: 'Map',
+        href: '/dashboard/map',
+        iconBg: '',
+        icon: (
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+          </svg>
+        ),
+      },
+      {
+        label: 'Businesses',
+        href: '/dashboard/businesses',
+        iconBg: '',
+        icon: (
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+          </svg>
+        ),
+      },
+      {
+        label: 'Follow-ups',
+        href: '/dashboard/followups',
+        iconBg: '',
+        icon: (
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+        ),
+      },
+      {
+        label: 'Tasks',
+        href: '/dashboard/tasks',
+        iconBg: '',
+        icon: (
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+          </svg>
+        ),
+      },
+    ],
+  },
+  {
+    label: 'Settings',
+    items: [
+      {
+        label: 'Activity',
+        href: '/dashboard/notifications',
+        iconBg: '',
+        icon: (
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+          </svg>
+        ),
+      },
+    ],
+  },
+];
+
+export default function Sidebar() {
+  const router = useRouter();
+
+  return (
+    <aside className="w-[220px] h-screen sticky top-0 bg-white border-r border-gray-200 flex flex-col select-none shrink-0">
+
+      {/* Company header */}
+      <div className="px-3.5 py-3.5 border-b border-gray-100">
+        <button className="flex items-center gap-2.5 w-full group px-1 py-0.5 rounded-lg hover:bg-gray-50 transition-colors">
+          <div className="w-7 h-7 bg-gray-900 rounded-lg flex items-center justify-center shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          </div>
+          <div className="flex-1 text-left min-w-0">
+            <p className="text-[13px] font-semibold text-gray-900 leading-none truncate">CRM Warsaw</p>
+            <p className="text-[10px] text-gray-400 mt-0.5">Business Intelligence</p>
+          </div>
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 px-2.5 pt-3 pb-2 overflow-y-auto">
+        {navGroups.map((group) => (
+          <div key={group.label} className="mb-3">
+            <p className="px-2 mb-1 text-[10px] font-semibold text-gray-400 uppercase tracking-widest">
+              {group.label}
+            </p>
+            <div className="space-y-0.5">
+              {group.items.map((item) => {
+                const active = router.pathname === item.href;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] font-medium transition-all ${
+                      active
+                        ? 'bg-gray-100 text-gray-900'
+                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    }`}
+                  >
+                    <span className={`w-4 h-4 flex items-center justify-center shrink-0 ${active ? 'text-gray-700' : 'text-gray-400'}`}>
+                      {item.icon}
+                    </span>
+                    <span className="flex-1 truncate">{item.label}</span>
+                    {item.badge && (
+                      <span className="text-[10px] font-semibold bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded-full leading-none">
+                        {item.badge}
+                      </span>
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </nav>
+
+      {/* User footer */}
+      <div className="px-3 py-3 border-t border-gray-100">
+        <div className="flex items-center gap-2.5 px-1">
+          <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-[11px] font-bold text-gray-600 shrink-0">
+            A
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-[12px] font-medium text-gray-800 truncate leading-none">Admin</p>
+            <p className="text-[10px] text-gray-400 mt-0.5">Warsaw HQ</p>
+          </div>
+          <Link href="/login" className="text-gray-300 hover:text-gray-500 transition-colors" title="Sign out">
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+          </Link>
+        </div>
+      </div>
+
+    </aside>
+  );
+}

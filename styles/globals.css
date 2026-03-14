@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body {
+  height: 100%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* District tooltip on the map */
+.district-tooltip {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  color: #374151;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 8px;
+  white-space: nowrap;
+}
+.district-tooltip::before { display: none; }
+
+/* Override Leaflet cursor in picking/relocating modes */
+.map-crosshair,
+.map-crosshair .leaflet-container,
+.map-crosshair .leaflet-grab,
+.map-crosshair .leaflet-dragging .leaflet-grab {
+  cursor: crosshair !important;
+}
