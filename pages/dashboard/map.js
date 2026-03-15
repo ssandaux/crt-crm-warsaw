@@ -140,6 +140,7 @@ export default function MapPage() {
   const [clusterMode, setClusterMode] = useState(true);
   const [showDistricts, setShowDistricts] = useState(false);
   const [showPoiMarkers, setShowPoiMarkers] = useState(false);
+  const [importConfirm, setImportConfirm] = useState(false);
   const [importing, setImporting] = useState(false);
   const [importProgress, setImportProgress] = useState(null);
   const [importDone, setImportDone] = useState(null);
@@ -239,6 +240,7 @@ export default function MapPage() {
 
   async function handleGoogleImport() {
     if (!googleMapRef.current) return;
+    setImportConfirm(false);
     setImporting(true);
     setImportDone(null);
     setImportProgress(null);
@@ -280,6 +282,28 @@ export default function MapPage() {
 
   return (
     <Layout fullWidth>
+      {importConfirm && (
+        <div className="fixed inset-0 z-[3000] flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 w-full max-w-sm mx-4 p-6">
+            <p className="text-[15px] font-bold text-gray-900 mb-2">Import from Google?</p>
+            <p className="text-[13px] text-gray-500 mb-6">Запустится сканирование 16 зон Варшавы (~3–4 мин). Новые бизнесы добавятся в CRM как <span className="font-medium text-gray-700">untouched</span>. Дубликаты будут пропущены.</p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setImportConfirm(false)}
+                className="flex-1 py-2.5 rounded-xl border border-gray-200 text-[13px] font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleGoogleImport}
+                className="flex-1 py-2.5 rounded-xl bg-gray-900 text-white text-[13px] font-semibold hover:bg-gray-800 transition-colors"
+              >
+                Yes, import
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {importing && (
         <div className="fixed inset-0 z-[3000] flex items-center justify-center bg-black/40 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 w-full max-w-sm mx-4 p-6">
@@ -453,7 +477,7 @@ export default function MapPage() {
         <ToolbarBtn
           active={false}
           activeClass=""
-          onClick={handleGoogleImport}
+          onClick={() => setImportConfirm(true)}
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
