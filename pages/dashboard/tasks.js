@@ -4,10 +4,11 @@ import PageHeader from '../../components/PageHeader';
 import { useData } from '../../components/DataContext';
 
 const STATUSES = [
-  { value: 'contacted', label: 'Contacted', color: 'bg-blue-100 text-blue-700' },
-  { value: 'agreed',    label: 'Agreed',    color: 'bg-emerald-100 text-emerald-700' },
-  { value: 'rejected',  label: 'Rejected',  color: 'bg-red-100 text-red-700' },
-  { value: 'follow_up', label: 'Follow-up', color: 'bg-amber-100 text-amber-700' },
+  { value: 'contacted', label: 'Contacted', dot: 'bg-amber-400' },
+  { value: 'agreed',    label: 'Agreed',    dot: 'bg-emerald-500' },
+  { value: 'rejected',  label: 'Rejected',  dot: 'bg-red-500' },
+  { value: 'client',    label: 'Client',    dot: 'bg-blue-500' },
+  { value: 'follow_up', label: 'Follow-up', dot: 'bg-purple-400' },
 ];
 
 const SKIP_TTL_DAYS = 7;
@@ -117,7 +118,7 @@ function ApproveDropdown({ onApprove }) {
               onClick={() => { setOpen(false); onApprove(s.value); }}
               className="w-full text-left px-3 py-2 text-[12px] hover:bg-gray-50 flex items-center gap-2"
             >
-              <span className={`inline-block w-2 h-2 rounded-full ${s.color.split(' ')[0]}`} />
+              <span className={`inline-block w-2 h-2 rounded-full ${s.dot}`} />
               {s.label}
             </button>
           ))}
