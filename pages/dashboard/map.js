@@ -286,7 +286,7 @@ export default function MapPage() {
         <div className="fixed inset-0 z-[3000] flex items-center justify-center bg-black/40 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 w-full max-w-sm mx-4 p-6">
             <p className="text-[15px] font-bold text-gray-900 mb-2">Import from Google?</p>
-            <p className="text-[13px] text-gray-500 mb-6">Запустится сканирование 36 зон Варшавы (~5–7 мин). Новые бизнесы добавятся в CRM как <span className="font-medium text-gray-700">untouched</span>. Дубликаты будут пропущены.</p>
+            <p className="text-[13px] text-gray-500 mb-6">Запустится сканирование 16 зон центральной Варшавы (~3–4 мин). Новые бизнесы добавятся в CRM как <span className="font-medium text-gray-700">untouched</span>. Дубликаты будут пропущены.</p>
             <div className="flex gap-3">
               <button
                 onClick={() => setImportConfirm(false)}
@@ -308,7 +308,7 @@ export default function MapPage() {
         <div className="fixed inset-0 z-[3000] flex items-center justify-center bg-black/40 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 w-full max-w-sm mx-4 p-6">
             <p className="text-[14px] font-bold text-gray-900 mb-1">Importing from Google Places</p>
-            <p className="text-[12px] text-gray-400 mb-5">Scanning 36 zones across Warsaw. Takes ~5–7 min.</p>
+            <p className="text-[12px] text-gray-400 mb-5">Scanning 16 zones across central Warsaw. Takes ~3–4 min.</p>
             {importProgress && (
               <div className="space-y-4">
                 <div>
