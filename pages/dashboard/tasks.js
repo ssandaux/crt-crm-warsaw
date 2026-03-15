@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import Layout from '../../components/Layout';
 import PageHeader from '../../components/PageHeader';
 import { useData } from '../../components/DataContext';
@@ -10,6 +10,15 @@ const STATUSES = [
 ];
 
 const SKIP_TTL_DAYS = 7;
+
+const DEFAULT_COL_WIDTHS = {
+  business: 320,
+  category: 130,
+  address:  220,
+  website:  190,
+  phone:    160,
+  actions:  200,
+};
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 function IconCheck() {
@@ -28,7 +37,7 @@ function IconSkip() {
 }
 function IconMapPin() {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
       <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
     </svg>
@@ -36,21 +45,21 @@ function IconMapPin() {
 }
 function IconLink() {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
     </svg>
   );
 }
 function IconPhone() {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
     </svg>
   );
 }
 function IconChevronDown() {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
     </svg>
   );
@@ -77,7 +86,49 @@ function IconRestore() {
   );
 }
 
-// ─── Split button: "Contacted" + chevron for custom status ───────────────────
+// ─── Resizable column header ───────────────────────────────────────────────
+function ResizableTh({ width, onResize, children, className = '', isLast = false }) {
+  const startX = useRef(null);
+  const startW = useRef(null);
+
+  const onMouseDown = useCallback((e) => {
+    e.preventDefault();
+    startX.current = e.clientX;
+    startW.current = width;
+
+    function onMove(ev) {
+      const delta = ev.clientX - startX.current;
+      const next  = Math.max(80, startW.current + delta);
+      onResize(next);
+    }
+    function onUp() {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+    }
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  }, [width, onResize]);
+
+  return (
+    <th
+      style={{ width, minWidth: width }}
+      className={`relative text-left px-4 py-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider bg-gray-50/60 border-b border-gray-100 select-none ${className}`}
+    >
+      {children}
+      {!isLast && (
+        <div
+          onMouseDown={onMouseDown}
+          className="absolute right-0 top-0 h-full w-4 flex items-center justify-center cursor-col-resize group z-10"
+          style={{ userSelect: 'none' }}
+        >
+          <div className="w-[3px] h-5 rounded-full bg-gray-200 group-hover:bg-gray-400 transition-colors" />
+        </div>
+      )}
+    </th>
+  );
+}
+
+// ─── Split button: "Contacted" + chevron for custom status ────────────────
 function ApproveDropdown({ onApprove }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
@@ -92,31 +143,36 @@ function ApproveDropdown({ onApprove }) {
   }, [open]);
 
   return (
-    <div className="relative flex items-center" ref={ref}>
+    <div className="relative inline-flex items-stretch rounded-lg overflow-visible shadow-sm" ref={ref}>
       {/* Main action: Contacted */}
       <button
         onClick={() => onApprove('contacted')}
-        className="inline-flex items-center gap-1.5 pl-3 pr-2.5 py-1.5 rounded-l-lg text-[12px] font-semibold bg-gray-900 text-white hover:bg-gray-800 transition-colors border-r border-gray-700"
+        className="inline-flex items-center gap-1.5 pl-3 pr-2.5 py-2 text-[12px] font-semibold bg-gray-900 text-white hover:bg-gray-700 active:bg-black transition-colors leading-none rounded-l-lg border-r border-white/20 whitespace-nowrap"
       >
-        <IconCheck /> Contacted
+        <IconCheck />
+        Contacted
       </button>
-      {/* Chevron: custom status */}
+      {/* Divider line */}
+      <div className="w-px bg-white/20 self-stretch" />
+      {/* Chevron */}
       <button
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex items-center justify-center px-2 py-1.5 rounded-r-lg text-[12px] font-semibold bg-gray-900 text-white hover:bg-gray-800 transition-colors"
+        className="inline-flex items-center justify-center px-2.5 py-2 text-[12px] bg-gray-900 text-white hover:bg-gray-700 active:bg-black transition-colors leading-none rounded-r-lg"
+        aria-label="More status options"
       >
         <IconChevronDown />
       </button>
+      {/* Dropdown */}
       {open && (
-        <div className="absolute right-0 top-full mt-1 z-50 bg-white border border-gray-200 rounded-xl shadow-lg py-1 min-w-[150px]">
-          <p className="px-3 pt-1.5 pb-1 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Set status</p>
+        <div className="absolute right-0 top-[calc(100%+6px)] z-50 bg-white border border-gray-200 rounded-xl shadow-xl py-1.5 min-w-[160px]">
+          <p className="px-3 pt-1 pb-1.5 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Set status</p>
           {STATUSES.map((s) => (
             <button
               key={s.value}
               onClick={() => { setOpen(false); onApprove(s.value); }}
-              className="w-full text-left px-3 py-2 text-[12px] hover:bg-gray-50 flex items-center gap-2"
+              className="w-full text-left px-3 py-2 text-[12px] text-gray-700 hover:bg-gray-50 flex items-center gap-2.5 transition-colors"
             >
-              <span className={`inline-block w-2 h-2 rounded-full ${s.dot}`} />
+              <span className={`inline-block w-2 h-2 rounded-full shrink-0 ${s.dot}`} />
               {s.label}
             </button>
           ))}
@@ -126,13 +182,11 @@ function ApproveDropdown({ onApprove }) {
   );
 }
 
-// ─── History panel ────────────────────────────────────────────────────────────
+// ─── History panel ─────────────────────────────────────────────────────────
 function HistoryPanel({ skippedList, onRestore, onClose }) {
   return (
     <div className="fixed inset-0 z-50 flex">
-      {/* backdrop */}
       <div className="flex-1 bg-black/20" onClick={onClose} />
-      {/* panel */}
       <div className="w-[420px] bg-white shadow-2xl flex flex-col h-full border-l border-gray-200">
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
           <div>
@@ -188,11 +242,16 @@ function HistoryPanel({ skippedList, onRestore, onClose }) {
   );
 }
 
-// ─── Main Page ────────────────────────────────────────────────────────────────
+// ─── Main Page ─────────────────────────────────────────────────────────────
 export default function TasksPage() {
   const { businesses, changeStatus, deleteBusinesses, ready } = useData();
-  const [approving, setApproving] = useState(new Set());
+  const [approving, setApproving]   = useState(new Set());
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [colWidths, setColWidths]   = useState(DEFAULT_COL_WIDTHS);
+
+  function setColWidth(col, w) {
+    setColWidths((prev) => ({ ...prev, [col]: w }));
+  }
 
   // On load: delete skipped businesses older than 7 days
   useEffect(() => {
@@ -208,27 +267,19 @@ export default function TasksPage() {
     }
   }, [ready]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const tasks = businesses.filter((b) => b.status === 'untouched');
+  const tasks       = businesses.filter((b) => b.status === 'untouched');
   const skippedList = businesses.filter((b) => b.status === 'skipped');
 
   async function handleApprove(biz, status) {
     setApproving((prev) => new Set([...prev, biz.id]));
     await changeStatus(biz.id, status);
-    setApproving((prev) => {
-      const next = new Set(prev);
-      next.delete(biz.id);
-      return next;
-    });
+    setApproving((prev) => { const n = new Set(prev); n.delete(biz.id); return n; });
   }
 
   async function handleSkip(biz) {
     setApproving((prev) => new Set([...prev, biz.id]));
     await changeStatus(biz.id, 'skipped');
-    setApproving((prev) => {
-      const next = new Set(prev);
-      next.delete(biz.id);
-      return next;
-    });
+    setApproving((prev) => { const n = new Set(prev); n.delete(biz.id); return n; });
   }
 
   async function handleRestore(id) {
@@ -264,6 +315,8 @@ export default function TasksPage() {
     );
   }
 
+  const totalWidth = Object.values(colWidths).reduce((a, b) => a + b, 0);
+
   return (
     <Layout fullWidth>
       <PageHeader
@@ -285,90 +338,132 @@ export default function TasksPage() {
         </div>
       ) : (
         <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
-          <table className="w-full text-[13px]">
-            <thead>
-              <tr className="border-b border-gray-100 bg-gray-50/60">
-                <th className="text-left px-4 py-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Business</th>
-                <th className="text-left px-4 py-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Category</th>
-                <th className="text-left px-4 py-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Address</th>
-                <th className="text-left px-4 py-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Website</th>
-                <th className="text-left px-4 py-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Phone</th>
-                <th className="text-right px-4 py-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {tasks.map((biz) => {
-                const url = normalizeUrl(biz.website);
-                const isProcessing = approving.has(biz.id);
-                return (
-                  <tr key={biz.id} className={`transition-colors ${isProcessing ? 'opacity-40' : 'hover:bg-gray-50/70'}`}>
-                    <td className="px-4 py-3">
-                      <span className="font-semibold text-gray-900">{biz.name}</span>
-                      {biz.district && biz.district !== '—' && (
-                        <span className="ml-2 text-[11px] text-gray-400">{biz.district}</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium bg-gray-100 text-gray-600">
-                        {biz.type || '—'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 max-w-[200px]">
-                      <span className="inline-flex items-center gap-1.5 text-gray-400 text-[12px] truncate">
-                        <IconMapPin className="shrink-0" />
-                        <span className="truncate">{biz.address || '—'}</span>
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 max-w-[180px]">
-                      {url ? (
-                        <a
-                          href={url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 text-[12px] text-blue-500 hover:text-blue-700 hover:underline transition-colors max-w-full"
-                        >
-                          <IconLink />
-                          <span className="truncate">{biz.website.replace(/^https?:\/\/(www\.)?/, '')}</span>
-                        </a>
-                      ) : (
-                        <span className="text-[12px] text-gray-200">—</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      {biz.phone && biz.phone !== '—' ? (
-                        <a
-                          href={`tel:${biz.phone}`}
-                          className="inline-flex items-center gap-1.5 text-[12px] text-gray-500 hover:text-gray-800 transition-colors whitespace-nowrap"
-                        >
-                          <IconPhone />
-                          {biz.phone}
-                        </a>
-                      ) : (
-                        <span className="text-[12px] text-gray-200">—</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center justify-end gap-2">
-                        {isProcessing ? (
-                          <span className="text-[12px] text-gray-400">Saving…</span>
-                        ) : (
-                          <>
-                            <ApproveDropdown onApprove={(status) => handleApprove(biz, status)} />
-                            <button
-                              onClick={() => handleSkip(biz)}
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium border border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-800 bg-white transition-colors"
-                            >
-                              <IconSkip /> Skip
-                            </button>
-                          </>
+          {/* Scrollable table wrapper */}
+          <div className="overflow-x-auto">
+            <table
+              className="text-[13px] border-collapse"
+              style={{ tableLayout: 'fixed', width: totalWidth, minWidth: '100%' }}
+            >
+              <colgroup>
+                <col style={{ width: colWidths.business }} />
+                <col style={{ width: colWidths.category }} />
+                <col style={{ width: colWidths.address }} />
+                <col style={{ width: colWidths.website }} />
+                <col style={{ width: colWidths.phone }} />
+                <col style={{ width: colWidths.actions }} />
+              </colgroup>
+              <thead>
+                <tr>
+                  <ResizableTh width={colWidths.business} onResize={(w) => setColWidth('business', w)}>
+                    Business
+                  </ResizableTh>
+                  <ResizableTh width={colWidths.category} onResize={(w) => setColWidth('category', w)}>
+                    Category
+                  </ResizableTh>
+                  <ResizableTh width={colWidths.address} onResize={(w) => setColWidth('address', w)}>
+                    Address
+                  </ResizableTh>
+                  <ResizableTh width={colWidths.website} onResize={(w) => setColWidth('website', w)}>
+                    Website
+                  </ResizableTh>
+                  <ResizableTh width={colWidths.phone} onResize={(w) => setColWidth('phone', w)}>
+                    Phone
+                  </ResizableTh>
+                  <ResizableTh width={colWidths.actions} onResize={() => {}} isLast className="text-right">
+                    Actions
+                  </ResizableTh>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {tasks.map((biz) => {
+                  const url          = normalizeUrl(biz.website);
+                  const isProcessing = approving.has(biz.id);
+                  return (
+                    <tr
+                      key={biz.id}
+                      className={`transition-colors ${isProcessing ? 'opacity-40 pointer-events-none' : 'hover:bg-gray-50/70'}`}
+                    >
+                      {/* Business */}
+                      <td className="px-4 py-3 overflow-hidden">
+                        <span className="font-semibold text-gray-900 truncate block">{biz.name}</span>
+                        {biz.district && biz.district !== '—' && (
+                          <span className="text-[11px] text-gray-400 truncate block">{biz.district}</span>
                         )}
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                      </td>
+
+                      {/* Category */}
+                      <td className="px-4 py-3 overflow-hidden">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium bg-gray-100 text-gray-600 truncate max-w-full">
+                          {biz.type || '—'}
+                        </span>
+                      </td>
+
+                      {/* Address */}
+                      <td className="px-4 py-3 overflow-hidden">
+                        <span className="inline-flex items-center gap-1.5 text-gray-400 text-[12px] w-full overflow-hidden">
+                          <IconMapPin />
+                          <span className="truncate">{biz.address || '—'}</span>
+                        </span>
+                      </td>
+
+                      {/* Website */}
+                      <td className="px-4 py-3 overflow-hidden">
+                        {url ? (
+                          <a
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 text-[12px] text-blue-500 hover:text-blue-700 hover:underline transition-colors w-full overflow-hidden"
+                          >
+                            <IconLink />
+                            <span className="truncate">
+                              {biz.website.replace(/^https?:\/\/(www\.)?/, '')}
+                            </span>
+                          </a>
+                        ) : (
+                          <span className="text-[12px] text-gray-200">—</span>
+                        )}
+                      </td>
+
+                      {/* Phone */}
+                      <td className="px-4 py-3 overflow-hidden whitespace-nowrap">
+                        {biz.phone && biz.phone !== '—' ? (
+                          <a
+                            href={`tel:${biz.phone}`}
+                            className="inline-flex items-center gap-1.5 text-[12px] text-gray-500 hover:text-gray-800 transition-colors whitespace-nowrap"
+                          >
+                            <IconPhone />
+                            {biz.phone}
+                          </a>
+                        ) : (
+                          <span className="text-[12px] text-gray-200">—</span>
+                        )}
+                      </td>
+
+                      {/* Actions */}
+                      <td className="px-4 py-3 overflow-visible">
+                        <div className="flex items-center justify-end gap-2 whitespace-nowrap">
+                          {isProcessing ? (
+                            <span className="text-[12px] text-gray-400 italic">Saving…</span>
+                          ) : (
+                            <>
+                              <ApproveDropdown onApprove={(status) => handleApprove(biz, status)} />
+                              <button
+                                onClick={() => handleSkip(biz)}
+                                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-[12px] font-medium border border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-800 bg-white transition-colors whitespace-nowrap"
+                              >
+                                <IconSkip /> Skip
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
 
           <div className="px-4 py-3 border-t border-gray-100 bg-gray-50/40">
             <p className="text-[12px] text-gray-400">{tasks.length} untouched businesses</p>

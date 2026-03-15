@@ -139,7 +139,7 @@ export default function MapPage() {
   const [showUncontacted, setShowUncontacted] = useState(false);
   const [clusterMode, setClusterMode] = useState(true);
   const [showDistricts, setShowDistricts] = useState(false);
-  const [showPoiMarkers, setShowPoiMarkers] = useState(false);
+  const [showPoiMarkers, setShowPoiMarkers] = useState(true);
   const [importConfirm, setImportConfirm] = useState(false);
   const [importing, setImporting] = useState(false);
   const [importProgress, setImportProgress] = useState(null);
@@ -381,15 +381,26 @@ export default function MapPage() {
 
         subtitle="Businesses across Warsaw by location and status."
         action={
-          <button
-            onClick={openAddModal}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-900 text-white text-[13px] font-semibold hover:bg-gray-800 transition-all"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-            </svg>
-            Add Business
-          </button>
+          <div className="flex flex-col items-end gap-2">
+            <button
+              onClick={openAddModal}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-900 text-white text-[13px] font-semibold hover:bg-gray-800 transition-all"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+              </svg>
+              Add Business
+            </button>
+            <button
+              onClick={() => setImportConfirm(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium border border-gray-200 bg-white text-gray-500 hover:border-gray-300 hover:text-gray-700 transition-all"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+              </svg>
+              Import from Google
+            </button>
+          </div>
         }
       />
 
@@ -437,7 +448,7 @@ export default function MapPage() {
         </span>
       </div>
 
-      {/* Toolbar */}
+      {/* Toolbar + Stats */}
       <div className="flex items-center gap-1.5 mb-4">
         <ToolbarBtn
           active={showUncontacted}
@@ -486,26 +497,26 @@ export default function MapPage() {
           {showPoiMarkers ? 'Hide Google places' : 'Show Google places'}
         </ToolbarBtn>
 
-        <ToolbarBtn
-          active={false}
-          activeClass=""
-          onClick={() => setImportConfirm(true)}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-          </svg>
-          Import from Google
-        </ToolbarBtn>
-
+        {/* Stats — right side */}
+        <div className="ml-auto flex items-center gap-5">
+          {statuses.map((s) => {
+            const cfg = STATUS_CONFIG[s];
+            return (
+              <div key={s} className="flex items-center gap-2">
+                <span className={`w-2 h-2 rounded-full shrink-0 ${cfg.color}`} />
+                <span className="text-[12px] text-gray-400 font-medium">{cfg.label}</span>
+                <span className="text-[13px] font-bold text-gray-700">{counts[s]}</span>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
-      <div className="flex gap-5">
-
-        {/* Map */}
-        <div className="flex-1 min-w-0">
+      {/* Map — full width */}
+      <div>
           <div
             className="relative w-full rounded-2xl border border-gray-200 overflow-hidden shadow-sm"
-            style={{ height: 'calc(100vh - 300px)', minHeight: '520px', maxHeight: '780px' }}
+            style={{ height: 'calc(100vh - 210px)', minHeight: '520px' }}
           >
             {/* Pick location banner */}
             {pickingLocation && (
@@ -567,26 +578,6 @@ export default function MapPage() {
             </div>
 
           </div>
-        </div>
-
-        {/* Right sidebar */}
-        <div className="w-52 flex flex-col gap-2.5 shrink-0">
-          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1 pt-0.5">Overview</p>
-          {statuses.map((s) => {
-            const cfg = STATUS_CONFIG[s];
-            const count = counts[s];
-            return (
-              <div key={s} className="bg-white rounded-2xl border border-gray-200 px-4 py-3 shadow-sm">
-                <div className="flex items-center gap-1.5 mb-2">
-                  <span className={`w-1.5 h-1.5 rounded-full ${cfg.color}`} />
-                  <p className="text-[11px] text-gray-500 font-medium">{cfg.label}</p>
-                </div>
-                <p className="text-2xl font-bold text-gray-900 leading-none">{count}</p>
-              </div>
-            );
-          })}
-        </div>
-
       </div>
     </Layout>
   );
