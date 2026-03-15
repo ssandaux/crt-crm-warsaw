@@ -185,7 +185,7 @@ function makeClusterIcon(color, count, diameter) {
 
 // ─── Main component ────────────────────────────────────────────────────────────
 
-export default function GoogleMapComp({ markers, selectedId, onMarkerClick, onMapClick, cluster, showDistricts, crosshair, onPoiClick, showPoiMarkers = true }) {
+export default function GoogleMapComp({ markers, selectedId, onMarkerClick, onMapClick, cluster, showDistricts, crosshair, onPoiClick, showPoiMarkers = true, onMapReady }) {
   const { isLoaded, loadError } = useJsApiLoader({
     id: 'crm-warsaw-map',
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
@@ -210,6 +210,7 @@ export default function GoogleMapComp({ markers, selectedId, onMarkerClick, onMa
 
   const onLoad = useCallback((map) => {
     mapRef.current = map;
+    if (onMapReady) onMapReady(map);
     map.addListener('click', (e) => {
       if (e.placeId) {
         e.stop();
