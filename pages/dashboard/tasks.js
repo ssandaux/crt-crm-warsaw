@@ -78,7 +78,7 @@ function IconRestore() {
   );
 }
 
-// ─── Status dropdown for Approve ─────────────────────────────────────────────
+// ─── Split button: "Contacted" + chevron for custom status ───────────────────
 function ApproveDropdown({ onApprove }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
@@ -93,15 +93,24 @@ function ApproveDropdown({ onApprove }) {
   }, [open]);
 
   return (
-    <div className="relative" ref={ref}>
+    <div className="relative flex items-center" ref={ref}>
+      {/* Main action: Contacted */}
+      <button
+        onClick={() => onApprove('contacted')}
+        className="inline-flex items-center gap-1.5 pl-3 pr-2.5 py-1.5 rounded-l-lg text-[12px] font-semibold bg-gray-900 text-white hover:bg-gray-800 transition-colors border-r border-gray-700"
+      >
+        <IconCheck /> Contacted
+      </button>
+      {/* Chevron: custom status */}
       <button
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-semibold bg-gray-900 text-white hover:bg-gray-800 transition-colors"
+        className="inline-flex items-center justify-center px-2 py-1.5 rounded-r-lg text-[12px] font-semibold bg-gray-900 text-white hover:bg-gray-800 transition-colors"
       >
-        <IconCheck /> Approve <IconChevronDown />
+        <IconChevronDown />
       </button>
       {open && (
-        <div className="absolute right-0 top-full mt-1 z-50 bg-white border border-gray-200 rounded-xl shadow-lg py-1 min-w-[140px]">
+        <div className="absolute right-0 top-full mt-1 z-50 bg-white border border-gray-200 rounded-xl shadow-lg py-1 min-w-[150px]">
+          <p className="px-3 pt-1.5 pb-1 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Set status</p>
           {STATUSES.map((s) => (
             <button
               key={s.value}
