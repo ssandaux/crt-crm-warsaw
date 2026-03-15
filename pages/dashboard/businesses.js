@@ -179,7 +179,7 @@ export default function BusinessesPage() {
   }
 
   const filtered = useMemo(() => {
-    let rows = [...(businesses ?? [])];
+    let rows = [...(businesses ?? [])].filter((b) => b.status !== 'skipped');
     if (search) {
       const q = search.toLowerCase();
       rows = rows.filter((b) => b.name.toLowerCase().includes(q) || b.email?.toLowerCase().includes(q) || b.note?.toLowerCase().includes(q));
@@ -286,7 +286,7 @@ export default function BusinessesPage() {
 
       <PageHeader
         title="Businesses"
-        count={businesses?.length ?? 0}
+        count={businesses?.filter((b) => b.status !== 'skipped').length ?? 0}
         subtitle="Track and manage all companies in the Warsaw pipeline."
         action={
           <div className="flex items-center gap-2">
