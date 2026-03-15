@@ -15,7 +15,7 @@ const COLUMNS = [
   { key: 'district',   label: 'District' },
   { key: 'contact',    label: 'Email' },
   { key: 'lastAction',  label: 'Last action' },
-  { key: 'followUpDate', label: 'Follow-up' },
+  { key: 'followUpDate', label: 'Reminder' },
   { key: 'note',        label: 'Note', noSort: true },
   { key: 'actions',    label: 'Actions', noSort: true },
 ];

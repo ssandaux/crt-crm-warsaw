@@ -27,7 +27,7 @@ const navGroups = [
         ),
       },
       {
-        label: 'Follow-ups',
+        label: 'Reminders',
         href: '/dashboard/followups',
         iconBg: '',
         icon: (
@@ -91,22 +91,8 @@ export default function Sidebar() {
     <aside className="w-[220px] h-screen sticky top-0 bg-white border-r border-gray-200 flex flex-col select-none shrink-0">
 
       {/* Company header */}
-      <div className="px-3.5 py-3.5 border-b border-gray-100">
-        <button className="flex items-center gap-2.5 w-full group px-1 py-0.5 rounded-lg hover:bg-gray-50 transition-colors">
-          <div className="w-7 h-7 bg-gray-900 rounded-lg flex items-center justify-center shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-          </div>
-          <div className="flex-1 text-left min-w-0">
-            <p className="text-[13px] font-semibold text-gray-900 leading-none truncate">CRM Warsaw</p>
-            <p className="text-[10px] text-gray-400 mt-0.5">Business Intelligence</p>
-          </div>
-          <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-          </svg>
-        </button>
+      <div className="px-4 py-3.5 border-b border-gray-100 flex items-center">
+        <img src="/logo-full-black.png" alt="Logo" className="h-7 w-auto object-contain" />
       </div>
 
       {/* Navigation */}
@@ -149,8 +135,8 @@ export default function Sidebar() {
       {/* User footer */}
       <div className="px-3 py-3 border-t border-gray-100">
         <div className="flex items-center gap-2.5 px-1">
-          <div className="w-7 h-7 rounded-full bg-gray-900 flex items-center justify-center text-[11px] font-bold text-white shrink-0">
-            {userInitial}
+          <div className="w-7 h-7 rounded-full overflow-hidden shrink-0 flex items-center justify-center bg-gray-100">
+            <img src="/logo-black.png" alt="Logo" className="w-5 h-5 object-contain" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-[12px] font-medium text-gray-800 truncate leading-none">{userEmail}</p>

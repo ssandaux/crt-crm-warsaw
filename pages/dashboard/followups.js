@@ -110,16 +110,16 @@ export default function FollowUpsPage() {
   return (
     <Layout>
       <PageHeader
-        title="Follow-ups"
+        title="Reminders"
         count={items.length}
-        subtitle="Businesses with scheduled follow-up dates."
+        subtitle="Businesses with scheduled reminder dates."
       />
 
       {items.length === 0 ? (
         <div className="mt-16 text-center">
-          <p className="text-[15px] font-semibold text-gray-400">No follow-ups scheduled</p>
+          <p className="text-[15px] font-semibold text-gray-400">No reminders scheduled</p>
           <p className="text-[13px] text-gray-300 mt-1">
-            Set follow-up dates on the{' '}
+            Set reminder dates on the{' '}
             <Link href="/dashboard/map" className="text-gray-500 underline underline-offset-2 hover:text-gray-700">
               Map
             </Link>{' '}

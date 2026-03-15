@@ -167,7 +167,7 @@ export default function AddPage() {
                     className={inputCls}
                   />
                 </Field>
-                <Field label="Follow-up Date" hint="Optional">
+                <Field label="Reminder Date" hint="Optional">
                   <input
                     type="date"
                     value={form.followUpDate}

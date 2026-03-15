@@ -125,7 +125,7 @@ export function EditModal({ biz, onClose, onSave }) {
               <input type="text" placeholder="e.g. Call Friday…" value={form.nextAction} onChange={(e) => set('nextAction', e.target.value)} className={`${inputCls} w-full`} />
             </div>
             <div>
-              <label className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide block mb-1">Follow-up Date</label>
+              <label className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide block mb-1">Reminder Date</label>
               <input type="date" value={form.followUpDate} onChange={(e) => set('followUpDate', e.target.value)} className={`${inputCls} w-full`} />
             </div>
           </div>

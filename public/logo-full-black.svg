@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4677 800" width="4677" height="800">
+  <defs><style>@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700&amp;display=swap');</style></defs>
+  <rect width="4677" height="800" fill="white"/>
+  <rect width="800" height="800" rx="144" fill="#0A0A0A"/>
+  <g transform="translate(100, 100) scale(37.5)">
+    <path d="M8 0.5 L10.3 5.7 L15.5 8 L10.3 10.3 L8 15.5 L5.7 10.3 L0.5 8 L5.7 5.7 Z" fill="white"/>
+  </g>
+  <text x="840" y="620" font-family="'Syne', sans-serif" font-weight="700" font-size="560" letter-spacing="-16" fill="#0A0A0A">CRT Agency</text>
+  <text x="4507" y="240" font-family="'Syne', sans-serif" font-weight="400" font-size="100" fill="#666666">®</text>
+</svg>

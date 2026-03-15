@@ -270,7 +270,7 @@ export default function BusinessProfile({ biz, onClose, onEdit, onDelete, onStat
                   )}
                   {fmtFollowUp && (
                     <p className={`text-[11px] font-medium mt-1 ${isOverdue ? 'text-red-500' : 'text-amber-600'} ${biz.nextAction ? 'mt-1.5' : ''}`}>
-                      {isOverdue ? 'Overdue · ' : 'Follow up · '}{fmtFollowUp}
+                      {isOverdue ? 'Overdue · ' : 'Reminder · '}{fmtFollowUp}
                     </p>
                   )}
                 </div>
@@ -331,7 +331,7 @@ export default function BusinessProfile({ biz, onClose, onEdit, onDelete, onStat
           {/* Follow-up date — map page only */}
           {onFollowUpChange && (
             <div className="px-5 py-4 border-b border-gray-100">
-              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-2">Follow-up date</p>
+              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-2">Reminder date</p>
               <input
                 type="date"
                 defaultValue={biz.followUpDate ?? ''}

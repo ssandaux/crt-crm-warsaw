@@ -10,6 +10,7 @@ const STATUSES = [
 ];
 
 const SKIP_TTL_DAYS = 7;
+const PAGE_SIZES = [10, 25, 50, 100];
 
 const DEFAULT_COL_WIDTHS = {
   business: 320,
@@ -143,36 +144,38 @@ function ApproveDropdown({ onApprove }) {
   }, [open]);
 
   return (
-    <div className="relative inline-flex items-stretch rounded-lg overflow-visible shadow-sm" ref={ref}>
+    <div className="relative inline-flex items-stretch" ref={ref}>
       {/* Main action: Contacted */}
       <button
         onClick={() => onApprove('contacted')}
-        className="inline-flex items-center gap-1.5 pl-3 pr-2.5 py-2 text-[12px] font-semibold bg-gray-900 text-white hover:bg-gray-700 active:bg-black transition-colors leading-none rounded-l-lg border-r border-white/20 whitespace-nowrap"
+        className="inline-flex items-center gap-1.5 pl-3.5 pr-3 py-[7px] text-[12px] font-medium tracking-wide bg-gray-900 text-white hover:bg-gray-800 active:scale-[0.98] transition-all leading-none rounded-l-md whitespace-nowrap select-none"
       >
         <IconCheck />
         Contacted
       </button>
-      {/* Divider line */}
-      <div className="w-px bg-white/20 self-stretch" />
+      {/* Subtle separator */}
+      <div className="w-px bg-white/10 self-stretch shrink-0" />
       {/* Chevron */}
       <button
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex items-center justify-center px-2.5 py-2 text-[12px] bg-gray-900 text-white hover:bg-gray-700 active:bg-black transition-colors leading-none rounded-r-lg"
+        className={`inline-flex items-center justify-center w-7 bg-gray-900 text-white/70 hover:text-white hover:bg-gray-800 active:scale-[0.98] transition-all leading-none rounded-r-md select-none ${open ? 'text-white' : ''}`}
         aria-label="More status options"
       >
-        <IconChevronDown />
+        <svg xmlns="http://www.w3.org/2000/svg" className={`w-3 h-3 transition-transform duration-150 ${open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
       </button>
       {/* Dropdown */}
       {open && (
-        <div className="absolute right-0 top-[calc(100%+6px)] z-50 bg-white border border-gray-200 rounded-xl shadow-xl py-1.5 min-w-[160px]">
-          <p className="px-3 pt-1 pb-1.5 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Set status</p>
+        <div className="absolute right-0 top-[calc(100%+5px)] z-50 bg-white border border-gray-100 rounded-xl shadow-[0_4px_24px_-4px_rgba(0,0,0,0.12)] py-1 min-w-[148px]">
+          <p className="px-3 pt-2 pb-1 text-[10px] font-semibold text-gray-300 uppercase tracking-widest">Move to</p>
           {STATUSES.map((s) => (
             <button
               key={s.value}
               onClick={() => { setOpen(false); onApprove(s.value); }}
-              className="w-full text-left px-3 py-2 text-[12px] text-gray-700 hover:bg-gray-50 flex items-center gap-2.5 transition-colors"
+              className="w-full text-left px-3 py-[7px] text-[12px] text-gray-600 hover:text-gray-900 hover:bg-gray-50/80 flex items-center gap-2.5 transition-colors"
             >
-              <span className={`inline-block w-2 h-2 rounded-full shrink-0 ${s.dot}`} />
+              <span className={`inline-block w-[7px] h-[7px] rounded-full shrink-0 ${s.dot}`} />
               {s.label}
             </button>
           ))}
@@ -248,6 +251,8 @@ export default function TasksPage() {
   const [approving, setApproving]   = useState(new Set());
   const [historyOpen, setHistoryOpen] = useState(false);
   const [colWidths, setColWidths]   = useState(DEFAULT_COL_WIDTHS);
+  const [page, setPage]             = useState(1);
+  const [pageSize, setPageSize]     = useState(25);
 
   function setColWidth(col, w) {
     setColWidths((prev) => ({ ...prev, [col]: w }));
@@ -269,6 +274,23 @@ export default function TasksPage() {
 
   const tasks       = businesses.filter((b) => b.status === 'untouched');
   const skippedList = businesses.filter((b) => b.status === 'skipped');
+
+  const totalPages  = Math.max(1, Math.ceil(tasks.length / pageSize));
+  const currentPage = Math.min(page, totalPages);
+  const pageRows    = tasks.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
+  const paginationPages = () => {
+    const pages = [];
+    if (totalPages <= 7) { for (let i = 1; i <= totalPages; i++) pages.push(i); }
+    else {
+      pages.push(1);
+      if (currentPage > 3) pages.push('...');
+      for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) pages.push(i);
+      if (currentPage < totalPages - 2) pages.push('...');
+      pages.push(totalPages);
+    }
+    return pages;
+  };
 
   async function handleApprove(biz, status) {
     setApproving((prev) => new Set([...prev, biz.id]));
@@ -375,7 +397,7 @@ export default function TasksPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
-                {tasks.map((biz) => {
+                {pageRows.map((biz) => {
                   const url          = normalizeUrl(biz.website);
                   const isProcessing = approving.has(biz.id);
                   return (
@@ -450,7 +472,7 @@ export default function TasksPage() {
                               <ApproveDropdown onApprove={(status) => handleApprove(biz, status)} />
                               <button
                                 onClick={() => handleSkip(biz)}
-                                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-[12px] font-medium border border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-800 bg-white transition-colors whitespace-nowrap"
+                                className="inline-flex items-center gap-1 px-2.5 py-[7px] rounded-md text-[12px] font-medium text-gray-400 hover:text-gray-700 hover:bg-gray-100 active:scale-[0.98] transition-all whitespace-nowrap select-none"
                               >
                                 <IconSkip /> Skip
                               </button>
@@ -465,8 +487,44 @@ export default function TasksPage() {
             </table>
           </div>
 
-          <div className="px-4 py-3 border-t border-gray-100 bg-gray-50/40">
-            <p className="text-[12px] text-gray-400">{tasks.length} untouched businesses</p>
+          <div className="px-4 py-3 border-t border-gray-100 bg-gray-50/40 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <p className="text-[12px] text-gray-400">
+                {tasks.length === 0 ? '0 results'
+                  : `${(currentPage - 1) * pageSize + 1}–${Math.min(currentPage * pageSize, tasks.length)} of ${tasks.length} result${tasks.length !== 1 ? 's' : ''}`}
+              </p>
+              <div className="flex items-center gap-1">
+                {PAGE_SIZES.map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => { setPageSize(s); setPage(1); }}
+                    className={`px-2 py-0.5 rounded text-[11px] font-medium transition-colors ${pageSize === s ? 'bg-gray-900 text-white' : 'text-gray-400 hover:text-gray-700'}`}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {totalPages > 1 && (
+              <div className="flex items-center gap-1">
+                <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1}
+                  className="w-7 h-7 flex items-center justify-center rounded-md border border-gray-200 text-gray-400 hover:text-gray-700 hover:border-gray-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
+                </button>
+                {paginationPages().map((p, i) =>
+                  p === '...'
+                    ? <span key={`e-${i}`} className="w-7 h-7 flex items-center justify-center text-[12px] text-gray-400">…</span>
+                    : <button key={p} onClick={() => setPage(p)}
+                        className={`w-7 h-7 flex items-center justify-center rounded-md text-[12px] font-medium transition-colors ${currentPage === p ? 'bg-gray-900 text-white' : 'border border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-800'}`}>
+                        {p}
+                      </button>
+                )}
+                <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}
+                  className="w-7 h-7 flex items-center justify-center rounded-md border border-gray-200 text-gray-400 hover:text-gray-700 hover:border-gray-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
