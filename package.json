@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@react-google-maps/api": "^2.20.8",
     "leaflet": "^1.9.4",
     "next": "^16.1.6",
     "react": "^18",

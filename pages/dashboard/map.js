@@ -9,7 +9,7 @@ import { STATUS_CONFIG, selectCls, inputCls } from '../../components/ui';
 import BusinessProfile from '../../components/BusinessProfile';
 import { EditModal, DeleteConfirm } from '../../components/BusinessModals';
 
-const LeafletMap = dynamic(() => import('../../components/LeafletMap'), { ssr: false });
+const GoogleMapComp = dynamic(() => import('../../components/GoogleMapComp'), { ssr: false });
 
 const STATUS_DOT_COLORS = {
   client:    'bg-blue-500',
@@ -295,7 +295,7 @@ export default function MapPage() {
         {/* Map */}
         <div className="flex-1 min-w-0">
           <div
-            className={`relative w-full rounded-2xl border border-gray-200 overflow-hidden shadow-sm ${relocatingId || pickingLocation ? 'map-crosshair' : ''}`}
+            className="relative w-full rounded-2xl border border-gray-200 overflow-hidden shadow-sm"
             style={{ height: 'calc(100vh - 300px)', minHeight: '520px', maxHeight: '780px' }}
           >
             {/* Pick location banner */}
@@ -326,13 +326,14 @@ export default function MapPage() {
               </div>
             )}
 
-            <LeafletMap
+            <GoogleMapComp
               markers={filtered}
               selectedId={selected}
               onMarkerClick={(id) => setSelected((prev) => (prev === id ? null : id))}
               onMapClick={handleMapClick}
               cluster={clusterMode}
               showDistricts={showDistricts}
+              crosshair={!!(relocatingId || pickingLocation)}
             />
 
             {/* Status legend */}
