@@ -4,7 +4,6 @@ import PageHeader from '../../components/PageHeader';
 import { useData } from '../../components/DataContext';
 
 const STATUSES = [
-  { value: 'contacted', label: 'Contacted', dot: 'bg-amber-400' },
   { value: 'agreed',    label: 'Agreed',    dot: 'bg-emerald-500' },
   { value: 'rejected',  label: 'Rejected',  dot: 'bg-red-500' },
   { value: 'client',    label: 'Client',    dot: 'bg-blue-500' },
