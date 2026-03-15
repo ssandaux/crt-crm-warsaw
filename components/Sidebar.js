@@ -91,7 +91,7 @@ export default function Sidebar() {
     <aside className="w-[220px] h-screen sticky top-0 bg-white border-r border-gray-200 flex flex-col select-none shrink-0">
 
       {/* Company header */}
-      <div className="px-4 py-3.5 border-b border-gray-100 flex items-center gap-3">
+      <div className="px-4 py-3.5 border-b border-gray-100 flex items-center gap-2">
         <img src="/logo-black.png" alt="Icon" className="h-7 w-auto object-contain shrink-0" />
         <img src="/wordmark-black.svg" alt="CRT Agency" className="h-6 w-auto object-contain" />
       </div>
