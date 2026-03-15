@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { useAuth } from './AuthContext';
 
 const navGroups = [
   {
@@ -66,6 +67,15 @@ const navGroups = [
 
 export default function Sidebar() {
   const router = useRouter();
+  const { user, signOut } = useAuth();
+
+  async function handleSignOut() {
+    await signOut();
+    router.replace('/login');
+  }
+
+  const userEmail = user?.email ?? '';
+  const userInitial = userEmail.charAt(0).toUpperCase() || 'U';
 
   return (
     <aside className="w-[220px] h-screen sticky top-0 bg-white border-r border-gray-200 flex flex-col select-none shrink-0">
@@ -129,18 +139,18 @@ export default function Sidebar() {
       {/* User footer */}
       <div className="px-3 py-3 border-t border-gray-100">
         <div className="flex items-center gap-2.5 px-1">
-          <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-[11px] font-bold text-gray-600 shrink-0">
-            A
+          <div className="w-7 h-7 rounded-full bg-gray-900 flex items-center justify-center text-[11px] font-bold text-white shrink-0">
+            {userInitial}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-[12px] font-medium text-gray-800 truncate leading-none">Admin</p>
+            <p className="text-[12px] font-medium text-gray-800 truncate leading-none">{userEmail}</p>
             <p className="text-[10px] text-gray-400 mt-0.5">Warsaw HQ</p>
           </div>
-          <Link href="/login" className="text-gray-300 hover:text-gray-500 transition-colors" title="Sign out">
+          <button onClick={handleSignOut} className="text-gray-300 hover:text-red-400 transition-colors" title="Sign out">
             <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
             </svg>
-          </Link>
+          </button>
         </div>
       </div>
 
