@@ -21,7 +21,11 @@ const MAP_OPTIONS = {
   },
   styles: [
     { featureType: 'poi', stylers: [{ visibility: 'off' }] },
-    { featureType: 'transit.station', elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
+    { featureType: 'transit', stylers: [{ visibility: 'off' }] },
+    { featureType: 'road', elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
+    { featureType: 'road.highway', elementType: 'labels.text', stylers: [{ visibility: 'off' }] },
+    { featureType: 'road.arterial', elementType: 'labels.text.fill', stylers: [{ color: '#aaaaaa' }] },
+    { featureType: 'administrative.neighborhood', stylers: [{ visibility: 'off' }] },
   ],
 };
 
