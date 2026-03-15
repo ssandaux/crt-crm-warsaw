@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
 
+const LIBRARIES = ['places'];
+
 const STATUS_COLORS = {
   client:    '#3b82f6',
   agreed:    '#10b981',
@@ -172,10 +174,11 @@ function makeClusterIcon(color, count, diameter) {
 
 // ─── Main component ────────────────────────────────────────────────────────────
 
-export default function GoogleMapComp({ markers, selectedId, onMarkerClick, onMapClick, cluster, showDistricts, crosshair }) {
+export default function GoogleMapComp({ markers, selectedId, onMarkerClick, onMapClick, cluster, showDistricts, crosshair, onPoiClick }) {
   const { isLoaded, loadError } = useJsApiLoader({
     id: 'crm-warsaw-map',
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
+    libraries: LIBRARIES,
   });
 
   const mapRef = useRef(null);
@@ -183,6 +186,10 @@ export default function GoogleMapComp({ markers, selectedId, onMarkerClick, onMa
   const [hoveredId, setHoveredId] = useState(null);
   const [districtsGeo, setDistrictsGeo] = useState(null);
   const markerJustClicked = useRef(false);
+  const onMapClickRef = useRef(onMapClick);
+  const onPoiClickRef = useRef(onPoiClick);
+  useEffect(() => { onMapClickRef.current = onMapClick; }, [onMapClick]);
+  useEffect(() => { onPoiClickRef.current = onPoiClick; }, [onPoiClick]);
 
   useEffect(() => {
     fetchDistricts()
@@ -192,6 +199,34 @@ export default function GoogleMapComp({ markers, selectedId, onMarkerClick, onMa
 
   const onLoad = useCallback((map) => {
     mapRef.current = map;
+    map.addListener('click', (e) => {
+      if (e.placeId) {
+        e.stop();
+        const cb = onPoiClickRef.current;
+        if (!cb) return;
+        const svc = new window.google.maps.places.PlacesService(map);
+        svc.getDetails(
+          { placeId: e.placeId, fields: ['name', 'formatted_address', 'formatted_phone_number', 'website', 'types', 'geometry'] },
+          (place, status) => {
+            if (status !== window.google.maps.places.PlacesServiceStatus.OK) return;
+            cb({
+              placeId: e.placeId,
+              name: place.name || '',
+              address: place.formatted_address || '',
+              phone: place.formatted_phone_number || '',
+              website: place.website || '',
+              types: place.types || [],
+              lat: place.geometry.location.lat(),
+              lng: place.geometry.location.lng(),
+            });
+          }
+        );
+      } else {
+        if (markerJustClicked.current) { markerJustClicked.current = false; return; }
+        const cb = onMapClickRef.current;
+        if (cb) cb({ latlng: { lat: e.latLng.lat(), lng: e.latLng.lng() } });
+      }
+    });
   }, []);
 
   const onUnmount = useCallback(() => {
@@ -243,11 +278,6 @@ export default function GoogleMapComp({ markers, selectedId, onMarkerClick, onMa
       if (mapRef.current.getZoom() < 14) mapRef.current.setZoom(14);
     }
   }, [selectedId, markers]);
-
-  const handleMapClick = useCallback((e) => {
-    if (markerJustClicked.current) { markerJustClicked.current = false; return; }
-    onMapClick({ latlng: { lat: e.latLng.lat(), lng: e.latLng.lng() } });
-  }, [onMapClick]);
 
   function renderMarkers() {
     if (!cluster) {
@@ -331,7 +361,6 @@ export default function GoogleMapComp({ markers, selectedId, onMarkerClick, onMa
       options={MAP_OPTIONS}
       onLoad={onLoad}
       onUnmount={onUnmount}
-      onClick={handleMapClick}
     >
       {renderMarkers()}
     </GoogleMap>

@@ -23,9 +23,9 @@ function IconClose() {
 }
 
 // onPickOnMap is optional — only shown on Map page
-export default function AddBusinessModal({ onClose, onSubmit, onPickOnMap, pendingCoords }) {
+export default function AddBusinessModal({ onClose, onSubmit, onPickOnMap, pendingCoords, defaultValues }) {
   const { isDuplicate } = useData();
-  const [form, setForm] = useState(EMPTY_FORM);
+  const [form, setForm] = useState(defaultValues ? { ...EMPTY_FORM, ...defaultValues } : EMPTY_FORM);
   const [errors, setErrors] = useState({});
   const [dupError, setDupError] = useState('');
   const [geocodedCoords, setGeocodedCoords] = useState(null);

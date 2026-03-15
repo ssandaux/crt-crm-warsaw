@@ -11,6 +11,76 @@ import { EditModal, DeleteConfirm } from '../../components/BusinessModals';
 
 const GoogleMapComp = dynamic(() => import('../../components/GoogleMapComp'), { ssr: false });
 
+const SKIP_TYPES = new Set(['point_of_interest', 'establishment', 'premise', 'political', 'locality', 'sublocality', 'sublocality_level_1', 'country', 'postal_code', 'route', 'street_address']);
+function formatType(types = []) {
+  const t = (types || []).find((t) => !SKIP_TYPES.has(t));
+  return t ? t.replace(/_/g, ' ') : 'Business';
+}
+function formatWebsite(url) {
+  try { return new URL(url).hostname.replace(/^www\./, ''); } catch { return url; }
+}
+
+function PlacePanel({ place, onClose, onAddToCrm }) {
+  return (
+    <>
+      <div className="fixed inset-0 z-[1500]" onClick={onClose} />
+      <div className="fixed top-0 right-0 h-screen w-[300px] bg-white border-l border-gray-200 shadow-2xl z-[1600] flex flex-col overflow-hidden">
+        <div className="flex items-start justify-between px-5 pt-5 pb-4 border-b border-gray-100">
+          <div className="flex-1 min-w-0 pr-3">
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Google Place</p>
+            <h2 className="text-[15px] font-bold text-gray-900 leading-snug">{place.name}</h2>
+            {place.types?.length > 0 && (
+              <span className="inline-block mt-1.5 text-[11px] text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full capitalize">
+                {formatType(place.types)}
+              </span>
+            )}
+          </div>
+          <button onClick={onClose} className="mt-0.5 p-1.5 text-gray-400 hover:text-gray-700 transition-colors rounded-lg hover:bg-gray-100 shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
+          {place.address && (
+            <div className="flex items-start gap-2 text-[12px] text-gray-600">
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 shrink-0 mt-0.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <span>{place.address}</span>
+            </div>
+          )}
+          {place.phone && (
+            <a href={`tel:${place.phone}`} className="flex items-center gap-2 text-[12px] text-gray-600 hover:text-gray-900 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+              </svg>
+              {place.phone}
+            </a>
+          )}
+          {place.website && (
+            <a href={place.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[12px] text-blue-600 hover:text-blue-700 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+              {formatWebsite(place.website)}
+            </a>
+          )}
+        </div>
+        <div className="px-5 pb-5 pt-3 border-t border-gray-100">
+          <button
+            onClick={onAddToCrm}
+            className="w-full py-2 bg-gray-900 text-white text-[13px] font-semibold rounded-xl hover:bg-gray-800 transition-all"
+          >
+            + Add to CRM
+          </button>
+        </div>
+      </div>
+    </>
+  );
+}
+
 const STATUS_DOT_COLORS = {
   client:    'bg-blue-500',
   agreed:    'bg-emerald-500',
@@ -70,6 +140,8 @@ export default function MapPage() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [pickingLocation, setPickingLocation] = useState(false);
   const [pendingCoords, setPendingCoords] = useState(null);
+  const [poiDefaults, setPoiDefaults] = useState(null);
+  const [selectedPoi, setSelectedPoi] = useState(null);
   const [editBiz, setEditBiz] = useState(null);
   const [deleteBiz, setDeleteBiz] = useState(null);
   const [relocatingId, setRelocatingId] = useState(null);
@@ -157,6 +229,25 @@ export default function MapPage() {
 
   const hasFilters = search || filterStatus || filterDistrict || showUncontacted;
 
+  function handlePoiClick(placeData) {
+    setSelected(null);
+    setSelectedPoi(placeData);
+  }
+
+  function handleAddPoiToCrm() {
+    const poi = selectedPoi;
+    setSelectedPoi(null);
+    const streetAddress = poi.address.split(',')[0] || poi.address;
+    setPendingCoords({ lat: poi.lat, lng: poi.lng });
+    setPoiDefaults({
+      name: poi.name,
+      type: formatType(poi.types),
+      address: streetAddress,
+      phone: poi.phone || '',
+    });
+    setShowAddModal(true);
+  }
+
   function handleEditFromProfile(biz) { setSelected(null); setEditBiz(biz); }
   function handleDeleteFromProfile(biz) { setSelected(null); setDeleteBiz(biz); }
   function handleConfirmDelete() {
@@ -168,15 +259,23 @@ export default function MapPage() {
     <Layout fullWidth>
       {showAddModal && (
         <AddBusinessModal
-          onClose={() => { setShowAddModal(false); setPendingCoords(null); }}
+          onClose={() => { setShowAddModal(false); setPendingCoords(null); setPoiDefaults(null); }}
           onSubmit={handleAddSubmit}
           onPickOnMap={handlePickOnMap}
           pendingCoords={pendingCoords}
+          defaultValues={poiDefaults}
         />
       )}
       {editBiz   && <EditModal biz={editBiz} onClose={() => setEditBiz(null)} onSave={(changes) => { updateBusiness(editBiz.id, changes); setEditBiz(null); }} />}
       {deleteBiz && <DeleteConfirm biz={deleteBiz} onClose={() => setDeleteBiz(null)} onConfirm={handleConfirmDelete} />}
-      {selectedMarker && !showAddModal && !editBiz && !deleteBiz && (
+      {selectedPoi && !showAddModal && (
+        <PlacePanel
+          place={selectedPoi}
+          onClose={() => setSelectedPoi(null)}
+          onAddToCrm={handleAddPoiToCrm}
+        />
+      )}
+      {selectedMarker && !showAddModal && !editBiz && !deleteBiz && !selectedPoi && (
         <BusinessProfile
           biz={selectedMarker}
           onClose={() => { setSelected(null); setRelocatingId(null); }}
@@ -329,11 +428,12 @@ export default function MapPage() {
             <GoogleMapComp
               markers={filtered}
               selectedId={selected}
-              onMarkerClick={(id) => setSelected((prev) => (prev === id ? null : id))}
+              onMarkerClick={(id) => { setSelectedPoi(null); setSelected((prev) => (prev === id ? null : id)); }}
               onMapClick={handleMapClick}
               cluster={clusterMode}
               showDistricts={showDistricts}
               crosshair={!!(relocatingId || pickingLocation)}
+              onPoiClick={handlePoiClick}
             />
 
             {/* Status legend */}
