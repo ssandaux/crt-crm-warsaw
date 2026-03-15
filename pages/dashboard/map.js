@@ -180,7 +180,7 @@ export default function MapPage() {
     setPickingLocation(true);
   }
 
-  function handleAddSubmit({ name, type, district, status, address, phone, email, note, coords }) {
+  function handleAddSubmit({ name, type, district, status, address, phone, email, website, note, coords }) {
     const newBiz = addBusiness({
       name: name.trim(),
       type: type.trim() || '—',
@@ -189,6 +189,7 @@ export default function MapPage() {
       address: address.trim() || '—',
       phone: phone.trim() || '—',
       email: email.trim() || '—',
+      website: website?.trim() || '',
       note: note.trim() || '',
       lat: coords?.lat ?? 52.2297,
       lng: coords?.lng ?? 21.0122,
@@ -244,6 +245,7 @@ export default function MapPage() {
       type: formatType(poi.types),
       address: streetAddress,
       phone: poi.phone || '',
+      website: poi.website || '',
     });
     setShowAddModal(true);
   }

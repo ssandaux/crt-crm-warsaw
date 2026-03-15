@@ -4,7 +4,7 @@ import { districts, statuses } from '../mockData/businesses';
 import { STATUS_CONFIG, selectCls, inputCls } from './ui';
 import { useData } from './DataContext';
 
-const EMPTY_FORM = { name: '', type: '', district: '', status: 'untouched', address: '', phone: '', email: '', note: '' };
+const EMPTY_FORM = { name: '', type: '', district: '', status: 'untouched', address: '', phone: '', email: '', website: '', note: '' };
 
 function IconPin() {
   return (
@@ -179,6 +179,18 @@ export default function AddBusinessModal({ onClose, onSubmit, onPickOnMap, pendi
                 className={`${inputCls} w-full`}
               />
             </div>
+          </div>
+
+          {/* Website */}
+          <div>
+            <label className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide block mb-1">Website</label>
+            <input
+              type="text"
+              placeholder="https://..."
+              value={form.website}
+              onChange={(e) => set('website', e.target.value)}
+              className={`${inputCls} w-full`}
+            />
           </div>
 
           {/* Note */}

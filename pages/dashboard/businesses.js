@@ -209,7 +209,7 @@ export default function BusinessesPage() {
   const allOnPageSelected = pageRows.length > 0 && pageRows.every((r) => selected.has(r.id));
   const selectedIds = [...selected];
 
-  function handleAddSubmit({ name, type, district, status, address, phone, email, note, coords }) {
+  function handleAddSubmit({ name, type, district, status, address, phone, email, website, note, coords }) {
     addBusiness({
       name: name.trim(),
       type: type.trim() || '—',
@@ -218,6 +218,7 @@ export default function BusinessesPage() {
       address: address.trim() || '—',
       phone: phone.trim() || '—',
       email: email.trim() || '—',
+      website: website?.trim() || '',
       note: note.trim() || '',
       lat: coords?.lat ?? 52.2297,
       lng: coords?.lng ?? 21.0122,

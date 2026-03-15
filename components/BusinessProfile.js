@@ -26,6 +26,13 @@ function IconMail() {
 function IconBuilding() {
   return <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 shrink-0 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>;
 }
+function IconWeb() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+    </svg>
+  );
+}
 function IconDistrict() {
   return <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 shrink-0 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064" /></svg>;
 }
@@ -278,6 +285,14 @@ export default function BusinessProfile({ biz, onClose, onEdit, onDelete, onStat
             <Row icon={<IconPin />}      value={biz.address} />
             <Row icon={<IconPhone />}    value={biz.phone} />
             <Row icon={<IconMail />}     value={biz.email} />
+            {biz.website && (
+              <div className="flex items-start gap-2.5">
+                <span className="mt-0.5 text-gray-400"><IconWeb /></span>
+                <a href={biz.website.startsWith('http') ? biz.website : `https://${biz.website}`} target="_blank" rel="noopener noreferrer" className="text-[13px] text-blue-600 hover:underline leading-snug break-all">
+                  {biz.website.replace(/^https?:\/\/(www\.)?/, '')}
+                </a>
+              </div>
+            )}
           </div>
 
           {/* Note */}
