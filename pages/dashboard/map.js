@@ -8,8 +8,16 @@ import { districts, statuses } from '../../mockData/businesses';
 import { STATUS_CONFIG, selectCls, inputCls } from '../../components/ui';
 import BusinessProfile from '../../components/BusinessProfile';
 import { EditModal, DeleteConfirm } from '../../components/BusinessModals';
+import { importFromOsm } from '../../lib/importOsm';
 
 const GoogleMapComp = dynamic(() => import('../../components/GoogleMapComp'), { ssr: false });
+
+const STEPS_LABELS = [
+  'Restaurants, cafes & bars',
+  'Shops & retail',
+  'Offices & services',
+  'Hotels, tourism & leisure',
+];
 
 const SKIP_TYPES = new Set(['point_of_interest', 'establishment', 'premise', 'political', 'locality', 'sublocality', 'sublocality_level_1', 'country', 'postal_code', 'route', 'street_address']);
 function formatType(types = []) {
@@ -136,7 +144,10 @@ export default function MapPage() {
   const [showUncontacted, setShowUncontacted] = useState(false);
   const [clusterMode, setClusterMode] = useState(true);
   const [showDistricts, setShowDistricts] = useState(false);
-  const [showPoiMarkers, setShowPoiMarkers] = useState(true);
+  const [showPoiMarkers, setShowPoiMarkers] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const [importProgress, setImportProgress] = useState(null);
+  const [importDone, setImportDone] = useState(null);
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [pickingLocation, setPickingLocation] = useState(false);
@@ -231,6 +242,20 @@ export default function MapPage() {
 
   const hasFilters = search || filterStatus || filterDistrict || showUncontacted;
 
+  async function handleOsmImport() {
+    setImporting(true);
+    setImportDone(null);
+    setImportProgress(null);
+    try {
+      const result = await importFromOsm((progress) => setImportProgress(progress));
+      setImportDone(result);
+      // Reload businesses from Supabase
+      window.location.reload();
+    } catch {
+      setImporting(false);
+    }
+  }
+
   function handlePoiClick(placeData) {
     setSelected(null);
     setSelectedPoi(placeData);
@@ -260,6 +285,47 @@ export default function MapPage() {
 
   return (
     <Layout fullWidth>
+      {importing && (
+        <div className="fixed inset-0 z-[3000] flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 w-full max-w-sm mx-4 p-6">
+            <p className="text-[14px] font-bold text-gray-900 mb-1">Importing from OpenStreetMap</p>
+            <p className="text-[12px] text-gray-400 mb-5">This may take 1–2 minutes. Please wait.</p>
+            {importProgress && (
+              <div className="space-y-3">
+                {Array.from({ length: importProgress.total }, (_, i) => {
+                  const stepNum = i + 1;
+                  const isCurrent = stepNum === importProgress.step;
+                  const isDone = stepNum < importProgress.step;
+                  return (
+                    <div key={i} className="flex items-center gap-3">
+                      <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${isDone ? 'bg-emerald-500' : isCurrent ? 'bg-gray-900' : 'bg-gray-100'}`}>
+                        {isDone ? (
+                          <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                        ) : isCurrent ? (
+                          <svg className="w-3 h-3 text-white animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/></svg>
+                        ) : (
+                          <span className="w-1.5 h-1.5 rounded-full bg-gray-300" />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-[12px] font-medium truncate ${isDone ? 'text-gray-400' : isCurrent ? 'text-gray-900' : 'text-gray-300'}`}>
+                          {STEPS_LABELS[i]}
+                        </p>
+                        {isCurrent && importProgress.count != null && (
+                          <p className="text-[11px] text-gray-400">{importProgress.count.toLocaleString()} found</p>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+                <p className="text-[12px] text-gray-500 pt-2 border-t border-gray-100">
+                  Added to CRM: <span className="font-semibold text-gray-900">{importProgress.totalInserted?.toLocaleString() ?? 0}</span>
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
       {showAddModal && (
         <AddBusinessModal
           onClose={() => { setShowAddModal(false); setPendingCoords(null); setPoiDefaults(null); }}
@@ -400,6 +466,17 @@ export default function MapPage() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
           {showPoiMarkers ? 'Hide Google places' : 'Show Google places'}
+        </ToolbarBtn>
+
+        <ToolbarBtn
+          active={false}
+          activeClass=""
+          onClick={handleOsmImport}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+          </svg>
+          Import from OSM
         </ToolbarBtn>
 
       </div>
