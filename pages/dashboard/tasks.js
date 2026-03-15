@@ -305,32 +305,32 @@ export default function TasksPage() {
                         {biz.type || '—'}
                       </span>
                     </td>
-                    <td className="px-4 py-3">
-                      <span className="inline-flex items-center gap-1.5 text-gray-400 text-[12px]">
-                        <IconMapPin />
-                        {biz.address || '—'}
+                    <td className="px-4 py-3 max-w-[200px]">
+                      <span className="inline-flex items-center gap-1.5 text-gray-400 text-[12px] truncate">
+                        <IconMapPin className="shrink-0" />
+                        <span className="truncate">{biz.address || '—'}</span>
                       </span>
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 max-w-[180px]">
                       {url ? (
                         <a
                           href={url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 text-[12px] text-blue-500 hover:text-blue-700 hover:underline transition-colors"
+                          className="inline-flex items-center gap-1.5 text-[12px] text-blue-500 hover:text-blue-700 hover:underline transition-colors max-w-full"
                         >
                           <IconLink />
-                          {biz.website.replace(/^https?:\/\/(www\.)?/, '')}
+                          <span className="truncate">{biz.website.replace(/^https?:\/\/(www\.)?/, '')}</span>
                         </a>
                       ) : (
                         <span className="text-[12px] text-gray-200">—</span>
                       )}
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 whitespace-nowrap">
                       {biz.phone && biz.phone !== '—' ? (
                         <a
                           href={`tel:${biz.phone}`}
-                          className="inline-flex items-center gap-1.5 text-[12px] text-gray-500 hover:text-gray-800 transition-colors"
+                          className="inline-flex items-center gap-1.5 text-[12px] text-gray-500 hover:text-gray-800 transition-colors whitespace-nowrap"
                         >
                           <IconPhone />
                           {biz.phone}
