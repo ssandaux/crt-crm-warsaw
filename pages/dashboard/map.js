@@ -8,7 +8,7 @@ import { districts, statuses } from '../../mockData/businesses';
 import { STATUS_CONFIG, selectCls, inputCls } from '../../components/ui';
 import BusinessProfile from '../../components/BusinessProfile';
 import { EditModal, DeleteConfirm } from '../../components/BusinessModals';
-import { importFromGoogle } from '../../lib/importGoogle';
+import { importFromGoogle, getImportWaveInfo, TOTAL_WAVES } from '../../lib/importGoogle';
 
 const GoogleMapComp = dynamic(() => import('../../components/GoogleMapComp'), { ssr: false });
 
@@ -282,11 +282,22 @@ export default function MapPage() {
 
   return (
     <Layout fullWidth>
-      {importConfirm && (
+      {importConfirm && (() => {
+        const info = getImportWaveInfo();
+        const waveLabels = ['центр Варшавы', 'средний пояс', 'внешний пояс'];
+        const area = waveLabels[info.wave - 1] ?? `пояс ${info.wave}`;
+        return (
         <div className="fixed inset-0 z-[3000] flex items-center justify-center bg-black/40 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 w-full max-w-sm mx-4 p-6">
-            <p className="text-[15px] font-bold text-gray-900 mb-2">Import from Google?</p>
-            <p className="text-[13px] text-gray-500 mb-6">Запустится сканирование 16 зон центральной Варшавы (~3–4 мин). Новые бизнесы добавятся в CRM как <span className="font-medium text-gray-700">untouched</span>. Дубликаты будут пропущены.</p>
+            <div className="flex items-center gap-2 mb-3">
+              <p className="text-[15px] font-bold text-gray-900">Import from Google</p>
+              <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">
+                Волна {info.wave} / {info.totalWaves}
+              </span>
+            </div>
+            <p className="text-[13px] text-gray-500 mb-6">
+              Будет просканирован <span className="font-medium text-gray-700">{area}</span> — {info.cellCount} зон (~3–4 мин). Новые бизнесы добавятся как <span className="font-medium text-gray-700">untouched</span>. Дубликаты пропускаются.
+            </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setImportConfirm(false)}
@@ -303,12 +314,13 @@ export default function MapPage() {
             </div>
           </div>
         </div>
-      )}
+        );
+      })()}
       {importing && (
         <div className="fixed inset-0 z-[3000] flex items-center justify-center bg-black/40 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 w-full max-w-sm mx-4 p-6">
             <p className="text-[14px] font-bold text-gray-900 mb-1">Importing from Google Places</p>
-            <p className="text-[12px] text-gray-400 mb-5">Scanning 16 zones across central Warsaw. Takes ~3–4 min.</p>
+            <p className="text-[12px] text-gray-400 mb-5">Scanning zones from center outward. Takes ~3–4 min.</p>
             {importProgress && (
               <div className="space-y-4">
                 <div>
