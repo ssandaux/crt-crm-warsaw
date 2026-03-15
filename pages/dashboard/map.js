@@ -134,7 +134,7 @@ export default function MapPage() {
   const [filterStatus, setFilterStatus] = useState('');
   const [filterDistrict, setFilterDistrict] = useState('');
   const [showUncontacted, setShowUncontacted] = useState(false);
-  const [clusterMode, setClusterMode] = useState(false);
+  const [clusterMode, setClusterMode] = useState(true);
   const [showDistricts, setShowDistricts] = useState(false);
   const [showPoiMarkers, setShowPoiMarkers] = useState(true);
 
