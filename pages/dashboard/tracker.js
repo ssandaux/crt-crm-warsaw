@@ -129,7 +129,7 @@ export default function TrackerPage() {
   const counts = Object.fromEntries(COLUMNS.map((c) => [c.key, tasks.filter((t) => t.status === c.key).length]));
 
   return (
-    <Layout>
+    <Layout fullWidth>
       <PageHeader
         title="Task Tracker"
         subtitle="Internal tasks and to-dos for the team."
