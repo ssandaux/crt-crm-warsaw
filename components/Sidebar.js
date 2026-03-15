@@ -93,7 +93,7 @@ export default function Sidebar() {
       {/* Company header */}
       <div className="px-4 py-3.5 border-b border-gray-100 flex items-center gap-3">
         <img src="/logo-black.png" alt="Icon" className="h-7 w-auto object-contain shrink-0" />
-        <img src="/wordmark-black.png" alt="CRT Agency" className="h-4 w-auto object-contain" />
+        <img src="/wordmark-black.png" alt="CRT Agency" className="h-6 w-auto object-contain" />
       </div>
 
       {/* Navigation */}
