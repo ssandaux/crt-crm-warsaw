@@ -4,10 +4,9 @@ import PageHeader from '../../components/PageHeader';
 import { useData } from '../../components/DataContext';
 
 const STATUSES = [
-  { value: 'agreed',    label: 'Agreed',    dot: 'bg-emerald-500' },
-  { value: 'rejected',  label: 'Rejected',  dot: 'bg-red-500' },
-  { value: 'client',    label: 'Client',    dot: 'bg-blue-500' },
-  { value: 'follow_up', label: 'Follow-up', dot: 'bg-purple-400' },
+  { value: 'agreed',   label: 'Agreed',   dot: 'bg-emerald-500' },
+  { value: 'rejected', label: 'Rejected', dot: 'bg-red-500' },
+  { value: 'client',   label: 'Client',   dot: 'bg-blue-500' },
 ];
 
 const SKIP_TTL_DAYS = 7;
