@@ -13,6 +13,24 @@ const STATUS_COLORS = {
 
 const WARSAW_CENTER = { lat: 52.2297, lng: 21.0122 };
 
+const BASE_STYLES = [
+  { featureType: 'poi.park', stylers: [{ visibility: 'off' }] },
+  { featureType: 'poi.place_of_worship', stylers: [{ visibility: 'off' }] },
+  { featureType: 'poi.school', stylers: [{ visibility: 'off' }] },
+  { featureType: 'poi.sports_complex', stylers: [{ visibility: 'off' }] },
+  { featureType: 'poi.medical', stylers: [{ visibility: 'off' }] },
+  { featureType: 'poi.government', stylers: [{ visibility: 'off' }] },
+  { featureType: 'transit', stylers: [{ visibility: 'off' }] },
+  { featureType: 'road', elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
+  { featureType: 'road.highway', elementType: 'labels.text', stylers: [{ visibility: 'off' }] },
+  { featureType: 'road.arterial', elementType: 'labels.text.fill', stylers: [{ color: '#aaaaaa' }] },
+  { featureType: 'administrative.neighborhood', stylers: [{ visibility: 'off' }] },
+];
+const STYLES_NO_POI = [
+  { featureType: 'poi', stylers: [{ visibility: 'off' }] },
+  ...BASE_STYLES,
+];
+
 const MAP_OPTIONS = {
   mapTypeControl: false,
   streetViewControl: false,
@@ -21,19 +39,7 @@ const MAP_OPTIONS = {
     latLngBounds: { north: 52.45, south: 52.05, east: 21.40, west: 20.75 },
     strictBounds: false,
   },
-  styles: [
-    { featureType: 'poi.park', stylers: [{ visibility: 'off' }] },
-    { featureType: 'poi.place_of_worship', stylers: [{ visibility: 'off' }] },
-    { featureType: 'poi.school', stylers: [{ visibility: 'off' }] },
-    { featureType: 'poi.sports_complex', stylers: [{ visibility: 'off' }] },
-    { featureType: 'poi.medical', stylers: [{ visibility: 'off' }] },
-    { featureType: 'poi.government', stylers: [{ visibility: 'off' }] },
-    { featureType: 'transit', stylers: [{ visibility: 'off' }] },
-    { featureType: 'road', elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
-    { featureType: 'road.highway', elementType: 'labels.text', stylers: [{ visibility: 'off' }] },
-    { featureType: 'road.arterial', elementType: 'labels.text.fill', stylers: [{ color: '#aaaaaa' }] },
-    { featureType: 'administrative.neighborhood', stylers: [{ visibility: 'off' }] },
-  ],
+  styles: BASE_STYLES,
 };
 
 // ─── District fetching (Overpass API) ─────────────────────────────────────────
@@ -179,7 +185,7 @@ function makeClusterIcon(color, count, diameter) {
 
 // ─── Main component ────────────────────────────────────────────────────────────
 
-export default function GoogleMapComp({ markers, selectedId, onMarkerClick, onMapClick, cluster, showDistricts, crosshair, onPoiClick }) {
+export default function GoogleMapComp({ markers, selectedId, onMarkerClick, onMapClick, cluster, showDistricts, crosshair, onPoiClick, showPoiMarkers = true }) {
   const { isLoaded, loadError } = useJsApiLoader({
     id: 'crm-warsaw-map',
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
@@ -243,6 +249,12 @@ export default function GoogleMapComp({ markers, selectedId, onMarkerClick, onMa
     if (!mapRef.current) return;
     mapRef.current.setOptions({ draggableCursor: crosshair ? 'crosshair' : '' });
   }, [crosshair]);
+
+  // POI markers visibility
+  useEffect(() => {
+    if (!mapRef.current) return;
+    mapRef.current.setOptions({ styles: showPoiMarkers ? BASE_STYLES : STYLES_NO_POI });
+  }, [showPoiMarkers]);
 
   // Districts data layer
   useEffect(() => {

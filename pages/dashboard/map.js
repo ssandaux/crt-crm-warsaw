@@ -136,6 +136,7 @@ export default function MapPage() {
   const [showUncontacted, setShowUncontacted] = useState(false);
   const [clusterMode, setClusterMode] = useState(false);
   const [showDistricts, setShowDistricts] = useState(false);
+  const [showPoiMarkers, setShowPoiMarkers] = useState(true);
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [pickingLocation, setPickingLocation] = useState(false);
@@ -389,6 +390,18 @@ export default function MapPage() {
           Districts
         </ToolbarBtn>
 
+        <ToolbarBtn
+          active={!showPoiMarkers}
+          activeClass="bg-gray-100 border-gray-300 text-gray-800"
+          onClick={() => setShowPoiMarkers((v) => !v)}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          {showPoiMarkers ? 'Hide Google places' : 'Show Google places'}
+        </ToolbarBtn>
+
       </div>
 
       <div className="flex gap-5">
@@ -436,6 +449,7 @@ export default function MapPage() {
               showDistricts={showDistricts}
               crosshair={!!(relocatingId || pickingLocation)}
               onPoiClick={handlePoiClick}
+              showPoiMarkers={showPoiMarkers}
             />
 
             {/* Status legend */}
