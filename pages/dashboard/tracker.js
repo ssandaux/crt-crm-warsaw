@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Layout from '../../components/Layout';
 import PageHeader from '../../components/PageHeader';
 import { supabase } from '../../lib/supabase';
@@ -41,8 +41,27 @@ export default function TrackerPage() {
   const [saving, setSaving] = useState(false);
   const [dragId, setDragId] = useState(null);
   const [dragOver, setDragOver] = useState(null); // column key being hovered
+  const [notes, setNotes] = useState('');
+  const [notesSaved, setNotesSaved] = useState(true);
+  const notesTimer = useRef(null);
 
   useEffect(() => { fetchTasks(); }, []);
+
+  // Load notes from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('crm_tracker_notes');
+    if (saved !== null) setNotes(saved);
+  }, []);
+
+  function handleNotesChange(val) {
+    setNotes(val);
+    setNotesSaved(false);
+    clearTimeout(notesTimer.current);
+    notesTimer.current = setTimeout(() => {
+      localStorage.setItem('crm_tracker_notes', val);
+      setNotesSaved(true);
+    }, 800);
+  }
 
   async function fetchTasks() {
     setLoading(true);
@@ -146,99 +165,126 @@ export default function TrackerPage() {
         </button>
       </PageHeader>
 
-      {/* Stats row */}
-      <div className="grid grid-cols-4 gap-3 mb-5">
-        {COLUMNS.map((col) => (
-          <div key={col.key} className="bg-white rounded-2xl border border-gray-200 px-4 py-3 shadow-sm">
-            <div className="flex items-center gap-1.5 mb-1.5">
-              <span className={`w-1.5 h-1.5 rounded-full ${col.color}`} />
-              <p className="text-[11px] text-gray-500 font-medium uppercase tracking-wide">{col.label}</p>
-            </div>
-            <p className="text-2xl font-bold text-gray-900 leading-none">{counts[col.key]}</p>
-          </div>
-        ))}
-      </div>
+      {/* Main content: kanban + notes */}
+      <div className="flex gap-5 items-start">
 
-      {/* Kanban board */}
-      {loading ? (
-        <div className="flex items-center justify-center py-20 text-gray-400 text-[13px]">Loading…</div>
-      ) : (
-        <div className="grid grid-cols-4 gap-4">
-          {COLUMNS.map((col) => {
-            const colTasks = tasks.filter((t) => t.status === col.key);
-            const isOver = dragOver === col.key;
-            return (
-              <div
-                key={col.key}
-                onDragOver={(e) => onDragOver(e, col.key)}
-                onDrop={(e) => onDrop(e, col.key)}
-                onDragLeave={() => setDragOver(null)}
-                className={`flex flex-col min-h-[400px] rounded-2xl border transition-colors ${isOver ? 'border-gray-400 bg-gray-50' : 'border-gray-200 bg-gray-50/60'}`}
-              >
-                {/* Column header */}
-                <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
-                  <div className="flex items-center gap-2">
-                    <span className={`w-2 h-2 rounded-full ${col.color}`} />
-                    <span className="text-[12px] font-semibold text-gray-700">{col.label}</span>
-                    <span className="text-[11px] text-gray-400 font-medium">{counts[col.key]}</span>
-                  </div>
-                  <button
-                    onClick={() => openAdd(col.key)}
-                    className="w-6 h-6 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-200 transition-colors"
-                    title="Add task"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                    </svg>
-                  </button>
+        {/* Kanban side */}
+        <div className="flex-1 min-w-0">
+          {/* Stats row */}
+          <div className="grid grid-cols-4 gap-3 mb-5">
+            {COLUMNS.map((col) => (
+              <div key={col.key} className="bg-white rounded-2xl border border-gray-200 px-4 py-3 shadow-sm">
+                <div className="flex items-center gap-1.5 mb-1.5">
+                  <span className={`w-1.5 h-1.5 rounded-full ${col.color}`} />
+                  <p className="text-[11px] text-gray-500 font-medium uppercase tracking-wide">{col.label}</p>
                 </div>
-
-                {/* Cards */}
-                <div className="flex flex-col gap-2 p-3 flex-1">
-                  {colTasks.length === 0 && (
-                    <div className="flex items-center justify-center flex-1 text-[12px] text-gray-300 select-none">
-                      Drop here
-                    </div>
-                  )}
-                  {colTasks.map((task) => {
-                    const pr = priorityMeta(task.priority);
-                    const dl = formatDeadline(task.deadline);
-                    const isDragging = dragId === task.id;
-                    return (
-                      <div
-                        key={task.id}
-                        draggable
-                        onDragStart={(e) => onDragStart(e, task.id)}
-                        onDragEnd={onDragEnd}
-                        onClick={() => openEdit(task)}
-                        className={`bg-white rounded-xl border border-gray-200 px-3.5 py-3 shadow-sm cursor-grab active:cursor-grabbing hover:shadow-md hover:border-gray-300 transition-all select-none ${isDragging ? 'opacity-40' : ''}`}
-                      >
-                        {/* Priority + deadline */}
-                        <div className="flex items-center justify-between mb-2">
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold ${pr.bg} ${pr.text}`}>
-                            {pr.label}
-                          </span>
-                          {dl && (
-                            <span className={`text-[10px] font-medium ${dl.overdue ? 'text-red-500' : dl.soon ? 'text-amber-500' : 'text-gray-400'}`}>
-                              {dl.overdue ? '⚠ ' : ''}{dl.label}
-                            </span>
-                          )}
-                        </div>
-                        {/* Title */}
-                        <p className="text-[13px] font-semibold text-gray-800 leading-snug mb-1">{task.title}</p>
-                        {/* Description */}
-                        {task.description && (
-                          <p className="text-[11px] text-gray-400 leading-snug line-clamp-2">{task.description}</p>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
+                <p className="text-2xl font-bold text-gray-900 leading-none">{counts[col.key]}</p>
               </div>
-            );
-          })}
+            ))}
+          </div>
+
+          {/* Kanban board */}
+          {loading ? (
+            <div className="flex items-center justify-center py-20 text-gray-400 text-[13px]">Loading…</div>
+          ) : (
+            <div className="grid grid-cols-4 gap-4">
+              {COLUMNS.map((col) => {
+                const colTasks = tasks.filter((t) => t.status === col.key);
+                const isOver = dragOver === col.key;
+                return (
+                  <div
+                    key={col.key}
+                    onDragOver={(e) => onDragOver(e, col.key)}
+                    onDrop={(e) => onDrop(e, col.key)}
+                    onDragLeave={() => setDragOver(null)}
+                    className={`flex flex-col min-h-[400px] rounded-2xl border transition-colors ${isOver ? 'border-gray-400 bg-gray-50' : 'border-gray-200 bg-gray-50/60'}`}
+                  >
+                    {/* Column header */}
+                    <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+                      <div className="flex items-center gap-2">
+                        <span className={`w-2 h-2 rounded-full ${col.color}`} />
+                        <span className="text-[12px] font-semibold text-gray-700">{col.label}</span>
+                        <span className="text-[11px] text-gray-400 font-medium">{counts[col.key]}</span>
+                      </div>
+                      <button
+                        onClick={() => openAdd(col.key)}
+                        className="w-6 h-6 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-200 transition-colors"
+                        title="Add task"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                        </svg>
+                      </button>
+                    </div>
+
+                    {/* Cards */}
+                    <div className="flex flex-col gap-2 p-3 flex-1">
+                      {colTasks.length === 0 && (
+                        <div className="flex items-center justify-center flex-1 text-[12px] text-gray-300 select-none">
+                          Drop here
+                        </div>
+                      )}
+                      {colTasks.map((task) => {
+                        const pr = priorityMeta(task.priority);
+                        const dl = formatDeadline(task.deadline);
+                        const isDragging = dragId === task.id;
+                        return (
+                          <div
+                            key={task.id}
+                            draggable
+                            onDragStart={(e) => onDragStart(e, task.id)}
+                            onDragEnd={onDragEnd}
+                            onClick={() => openEdit(task)}
+                            className={`bg-white rounded-xl border border-gray-200 px-3.5 py-3 shadow-sm cursor-grab active:cursor-grabbing hover:shadow-md hover:border-gray-300 transition-all select-none ${isDragging ? 'opacity-40' : ''}`}
+                          >
+                            <div className="flex items-center justify-between mb-2">
+                              <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold ${pr.bg} ${pr.text}`}>
+                                {pr.label}
+                              </span>
+                              {dl && (
+                                <span className={`text-[10px] font-medium ${dl.overdue ? 'text-red-500' : dl.soon ? 'text-amber-500' : 'text-gray-400'}`}>
+                                  {dl.overdue ? '⚠ ' : ''}{dl.label}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-[13px] font-semibold text-gray-800 leading-snug mb-1">{task.title}</p>
+                            {task.description && (
+                              <p className="text-[11px] text-gray-400 leading-snug line-clamp-2">{task.description}</p>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
-      )}
+
+        {/* Notes panel */}
+        <div className="w-72 shrink-0 flex flex-col bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden" style={{ minHeight: 520 }}>
+          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+            <div className="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+              <span className="text-[12px] font-semibold text-gray-700">Notes</span>
+            </div>
+            <span className={`text-[10px] font-medium transition-colors ${notesSaved ? 'text-gray-300' : 'text-amber-400'}`}>
+              {notesSaved ? 'Saved' : 'Saving…'}
+            </span>
+          </div>
+          <textarea
+            value={notes}
+            onChange={(e) => handleNotesChange(e.target.value)}
+            placeholder="Write notes, ideas, reminders…"
+            className="flex-1 w-full px-4 py-3 text-[13px] text-gray-700 placeholder:text-gray-300 leading-relaxed resize-none focus:outline-none"
+            style={{ minHeight: 460 }}
+          />
+        </div>
+
+      </div>
 
       {/* Modal */}
       {modal && (
