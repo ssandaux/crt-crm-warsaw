@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useAuth } from './AuthContext';
+import { useTheme } from './ThemeContext';
 
 const navGroups = [
   {
@@ -78,6 +79,7 @@ const navGroups = [
 export default function Sidebar() {
   const router = useRouter();
   const { user, signOut } = useAuth();
+  const { dark, toggle } = useTheme();
 
   async function handleSignOut() {
     await signOut();
@@ -88,12 +90,12 @@ export default function Sidebar() {
   const userInitial = userEmail.charAt(0).toUpperCase() || 'U';
 
   return (
-    <aside className="w-[220px] h-screen sticky top-0 bg-white border-r border-gray-200 flex flex-col select-none shrink-0">
+    <aside className="w-[220px] h-screen sticky top-0 bg-white dark:bg-[#111827] border-r border-gray-200 dark:border-[#1f2d42] flex flex-col select-none shrink-0">
 
       {/* Company header */}
-      <div className="px-4 py-3.5 border-b border-gray-100 flex items-center gap-2">
-        <img src="/logo-black.png" alt="Icon" className="h-7 w-auto object-contain shrink-0" />
-        <img src="/wordmark-black.svg" alt="CRT Agency" className="h-6 w-auto object-contain" />
+      <div className="px-4 py-3.5 border-b border-gray-100 dark:border-[#1f2d42] flex items-center gap-2">
+        <img src="/logo-black.png" alt="Icon" className="h-7 w-auto object-contain shrink-0 dark:invert" />
+        <img src="/wordmark-black.svg" alt="CRT Agency" className="h-6 w-auto object-contain dark:invert" />
       </div>
 
       {/* Navigation */}
@@ -112,8 +114,8 @@ export default function Sidebar() {
                     href={item.href}
                     className={`flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] font-medium transition-all ${
                       active
-                        ? 'bg-gray-100 text-gray-900'
-                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                        ? 'bg-gray-100 dark:bg-[#1f2d42] text-gray-900 dark:text-white'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#1a2540] hover:text-gray-900 dark:hover:text-white'
                     }`}
                   >
                     <span className={`w-4 h-4 flex items-center justify-center shrink-0 ${active ? 'text-gray-700' : 'text-gray-400'}`}>
@@ -133,11 +135,38 @@ export default function Sidebar() {
         ))}
       </nav>
 
+      {/* Theme toggle */}
+      <div className="px-3 pb-1">
+        <button
+          onClick={toggle}
+          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#1f2d42] transition-colors group"
+          title={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+        >
+          {/* Icon */}
+          <span className="w-4 h-4 flex items-center justify-center shrink-0">
+            {dark ? (
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 7a5 5 0 100 10A5 5 0 0012 7z" />
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+              </svg>
+            )}
+          </span>
+          <span className="flex-1 text-[12px] font-medium text-left">{dark ? 'Light mode' : 'Dark mode'}</span>
+          {/* Pill toggle */}
+          <div className={`relative w-8 h-[18px] rounded-full transition-colors duration-300 ${dark ? 'bg-gray-600' : 'bg-gray-200'}`}>
+            <div className={`absolute top-[3px] w-3 h-3 rounded-full bg-white shadow-sm transition-transform duration-300 ${dark ? 'translate-x-[18px]' : 'translate-x-[3px]'}`} />
+          </div>
+        </button>
+      </div>
+
       {/* User footer */}
-      <div className="px-3 py-3 border-t border-gray-100">
+      <div className="px-3 py-3 border-t border-gray-100 dark:border-[#1f2d42]">
         <div className="flex items-center gap-2.5 px-1">
           <div className="w-7 h-7 rounded-full overflow-hidden shrink-0 flex items-center justify-center bg-gray-100">
-            <img src="/logo-black.png" alt="Logo" className="w-5 h-5 object-contain" />
+            <img src="/logo-black.png" alt="Logo" className="w-5 h-5 object-contain dark:invert" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-[12px] font-medium text-gray-800 truncate leading-none">{userEmail}</p>

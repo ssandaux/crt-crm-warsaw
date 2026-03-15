@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { DataProvider } from '../components/DataContext';
 import { AuthProvider, useAuth } from '../components/AuthContext';
+import { ThemeProvider } from '../components/ThemeContext';
 
 const PUBLIC_PATHS = ['/login'];
 
@@ -47,12 +48,14 @@ function RouteGuard({ children }) {
 
 export default function App({ Component, pageProps }) {
   return (
-    <AuthProvider>
-      <RouteGuard>
-        <DataProvider>
-          <Component {...pageProps} />
-        </DataProvider>
-      </RouteGuard>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <RouteGuard>
+          <DataProvider>
+            <Component {...pageProps} />
+          </DataProvider>
+        </RouteGuard>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
