@@ -1,7 +1,7 @@
-export default function PageHeader({ title, subtitle, count, action, children }) {
+export default function PageHeader({ title, subtitle, count, action, children, className = 'mb-6' }) {
   const actionContent = action ?? children;
   return (
-    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-6">
+    <div className={`flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 ${className}`}>
       <div>
         <div className="flex items-center gap-2.5">
           <h1 className="text-[20px] sm:text-[22px] font-bold text-gray-900 tracking-tight leading-none">{title}</h1>
