@@ -361,21 +361,19 @@ export default function BusinessesPage() {
               className="w-full sm:w-48 pl-8 pr-3 py-[7px] text-[13px] text-gray-700 bg-white border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent placeholder-gray-400 transition hover:border-gray-300" />
           </div>
 
-          {/* 3 dropdowns — equal width row on mobile */}
-          <div className="flex gap-2 w-full sm:w-auto sm:contents">
-            <div className="flex-1 sm:flex-none">
-              <StatusSelect
-                value={filterStatus}
-                onChange={(v) => { setFilterStatus(v); setPage(1); }}
-                statuses={statuses}
-                fullWidth
-              />
-            </div>
-            <select value={filterType} onChange={(e) => { setFilterType(e.target.value); setPage(1); }} className={`flex-1 sm:flex-none ${selectCls}`}>
+          {/* 3 dropdowns — equal width row on mobile, natural on desktop */}
+          <div className="grid grid-cols-3 gap-2 w-full sm:w-auto sm:flex sm:flex-wrap sm:items-center">
+            <StatusSelect
+              value={filterStatus}
+              onChange={(v) => { setFilterStatus(v); setPage(1); }}
+              statuses={statuses}
+              fullWidth
+            />
+            <select value={filterType} onChange={(e) => { setFilterType(e.target.value); setPage(1); }} className={`w-full sm:w-auto ${selectCls}`}>
               <option value="">All types</option>
               {types.map((t) => <option key={t} value={t}>{t}</option>)}
             </select>
-            <select value={filterDistrict} onChange={(e) => { setFilterDistrict(e.target.value); setPage(1); }} className={`flex-1 sm:flex-none ${selectCls}`}>
+            <select value={filterDistrict} onChange={(e) => { setFilterDistrict(e.target.value); setPage(1); }} className={`w-full sm:w-auto ${selectCls}`}>
               <option value="">All districts</option>
               {districts.map((d) => <option key={d} value={d}>{d}</option>)}
             </select>

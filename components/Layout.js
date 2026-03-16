@@ -8,7 +8,7 @@ export default function Layout({ children, fullWidth }) {
     <div className="flex h-screen overflow-hidden bg-[#f8f9fb] dark:bg-[#111111]">
       <Sidebar mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
 
-      <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
+      <main className="flex-1 flex flex-col min-w-0 overflow-y-auto overflow-x-hidden">
         {/* Mobile top bar — sticky */}
         <div className="sm:hidden sticky top-0 z-50 relative flex items-center justify-center h-14 border-b border-gray-200 dark:border-[#2a2a2a] bg-white dark:bg-[#191919] shrink-0">
           <button
