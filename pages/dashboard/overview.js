@@ -190,7 +190,7 @@ export default function OverviewPage() {
         Import from Google
       </button>
       <p className="text-[11px] text-gray-400 text-center mb-6">
-        До 1 000 новых бизнесов за один импорт · Лимит базы данных: 10 000
+        Up to 1,000 new businesses per import · Total database limit: 10,000
       </p>
     </Layout>
   );
