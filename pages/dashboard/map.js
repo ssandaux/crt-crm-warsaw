@@ -449,15 +449,16 @@ export default function MapPage() {
         </span>
       </div>
 
-      {/* Toolbar + Stats */}
-      <div className="flex flex-wrap items-center gap-1.5 mb-4">
+      {/* Toolbar */}
+      <div className="flex flex-wrap items-center gap-1.5 mb-2">
         <ToolbarBtn
           active={showUncontacted}
           activeClass="bg-gray-100 border-gray-300 text-gray-700"
           onClick={toggleUncontacted}
         >
           <span className="w-1.5 h-1.5 rounded-full bg-gray-400 shrink-0" />
-          Untouched only
+          <span className="hidden sm:inline">Untouched only</span>
+          <span className="sm:hidden">Untouched</span>
         </ToolbarBtn>
 
         <ToolbarBtn
@@ -472,7 +473,8 @@ export default function MapPage() {
             <circle cx="5" cy="19" r="2" strokeLinecap="round" />
             <circle cx="19" cy="19" r="2" strokeLinecap="round" />
           </svg>
-          Cluster markers
+          <span className="hidden sm:inline">Cluster markers</span>
+          <span className="sm:hidden">Cluster</span>
         </ToolbarBtn>
 
         <ToolbarBtn
@@ -495,11 +497,12 @@ export default function MapPage() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
-          {showPoiMarkers ? 'Hide Google places' : 'Show Google places'}
+          <span className="hidden sm:inline">{showPoiMarkers ? 'Hide Google places' : 'Show Google places'}</span>
+          <span className="sm:hidden">{showPoiMarkers ? 'Hide POI' : 'Show POI'}</span>
         </ToolbarBtn>
 
-        {/* Stats — right side */}
-        <div className="ml-auto flex items-center gap-5">
+        {/* Stats — inline on desktop, own row on mobile */}
+        <div className="hidden sm:flex ml-auto items-center gap-5">
           {statuses.map((s) => {
             const cfg = STATUS_CONFIG[s];
             return (
@@ -513,11 +516,25 @@ export default function MapPage() {
         </div>
       </div>
 
+      {/* Stats row — mobile only */}
+      <div className="flex sm:hidden items-center gap-3 flex-wrap mb-3">
+        {statuses.map((s) => {
+          const cfg = STATUS_CONFIG[s];
+          return (
+            <div key={s} className="flex items-center gap-1.5">
+              <span className={`w-2 h-2 rounded-full shrink-0 ${cfg.color}`} />
+              <span className="text-[11px] text-gray-500 font-medium">{cfg.label}</span>
+              <span className="text-[12px] font-bold text-gray-700">{counts[s]}</span>
+            </div>
+          );
+        })}
+      </div>
+
       {/* Map — full width */}
       <div>
           <div
             className="relative w-full rounded-2xl border border-gray-200 overflow-hidden shadow-sm"
-            style={{ height: 'calc(100dvh - 320px)', minHeight: '320px' }}
+            style={{ height: 'calc(100dvh - 380px)', minHeight: '280px' }}
           >
             {/* Pick location banner */}
             {pickingLocation && (

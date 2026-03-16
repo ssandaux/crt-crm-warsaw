@@ -170,17 +170,30 @@ export default function TrackerPage() {
 
         {/* Kanban side */}
         <div className="flex-1 min-w-0">
-          {/* Stats row */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mb-4 sm:mb-5">
-            {COLUMNS.map((col) => (
-              <div key={col.key} className="bg-white rounded-2xl border border-gray-200 px-4 py-3 shadow-sm">
-                <div className="flex items-center gap-1.5 mb-1.5">
-                  <span className={`w-1.5 h-1.5 rounded-full ${col.color}`} />
-                  <p className="text-[11px] text-gray-500 font-medium uppercase tracking-wide">{col.label}</p>
+          {/* Stats row — compact strip on mobile, cards on desktop */}
+          <div className="mb-4 sm:mb-5">
+            {/* Mobile: inline dot + label + count */}
+            <div className="flex items-center gap-4 sm:hidden px-1 py-1 overflow-x-auto">
+              {COLUMNS.map((col) => (
+                <div key={col.key} className="flex items-center gap-1.5 shrink-0">
+                  <span className={`w-2 h-2 rounded-full shrink-0 ${col.color}`} />
+                  <span className="text-[12px] text-gray-500 font-medium">{col.label}</span>
+                  <span className="text-[13px] font-bold text-gray-800">{counts[col.key]}</span>
                 </div>
-                <p className="text-2xl font-bold text-gray-900 leading-none">{counts[col.key]}</p>
-              </div>
-            ))}
+              ))}
+            </div>
+            {/* Desktop: card grid */}
+            <div className="hidden sm:grid grid-cols-4 gap-3">
+              {COLUMNS.map((col) => (
+                <div key={col.key} className="bg-white rounded-2xl border border-gray-200 px-4 py-3 shadow-sm">
+                  <div className="flex items-center gap-1.5 mb-1.5">
+                    <span className={`w-1.5 h-1.5 rounded-full ${col.color}`} />
+                    <p className="text-[11px] text-gray-500 font-medium uppercase tracking-wide">{col.label}</p>
+                  </div>
+                  <p className="text-2xl font-bold text-gray-900 leading-none">{counts[col.key]}</p>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Kanban board */}
@@ -197,7 +210,7 @@ export default function TrackerPage() {
                     onDragOver={(e) => onDragOver(e, col.key)}
                     onDrop={(e) => onDrop(e, col.key)}
                     onDragLeave={() => setDragOver(null)}
-                    className={`flex flex-col min-h-[400px] rounded-2xl border transition-colors shrink-0 w-[280px] snap-start md:w-auto ${isOver ? 'border-gray-400 bg-gray-50' : 'border-gray-200 bg-gray-50/60'}`}
+                    className={`flex flex-col min-h-[200px] sm:min-h-[400px] rounded-2xl border transition-colors shrink-0 w-[260px] snap-start md:w-auto ${isOver ? 'border-gray-400 bg-gray-50' : 'border-gray-200 bg-gray-50/60'}`}
                   >
                     {/* Column header */}
                     <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
