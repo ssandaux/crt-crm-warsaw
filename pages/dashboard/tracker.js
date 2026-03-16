@@ -157,7 +157,7 @@ export default function TrackerPage() {
       >
         <button
           onClick={() => openAdd()}
-          className="inline-flex items-center gap-1.5 px-4 py-2.5 sm:px-3.5 sm:py-2 rounded-xl text-[14px] sm:text-[13px] font-semibold bg-gray-900 text-white hover:bg-gray-800 transition-colors"
+          className="inline-flex items-center gap-1.5 px-4 py-2.5 sm:px-5 sm:py-2.5 rounded-xl text-[14px] sm:text-[14px] font-semibold bg-gray-900 text-white hover:bg-gray-800 transition-colors"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
@@ -167,7 +167,7 @@ export default function TrackerPage() {
       </PageHeader>
 
       {/* Main content: kanban + notes */}
-      <div className="flex flex-col lg:flex-row gap-5 lg:items-start">
+      <div className="flex flex-col lg:flex-row gap-5 lg:items-stretch">
 
         {/* Kanban side */}
         <div className="w-full min-w-0 lg:flex-1">
@@ -318,7 +318,7 @@ export default function TrackerPage() {
         </div>
 
         {/* Notes panel */}
-        <div className="w-full lg:w-72 lg:shrink-0 flex flex-col bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden mb-4 lg:mb-0" style={{ minHeight: 'auto', height: 272 }}>
+        <div className="w-full lg:w-72 lg:shrink-0 flex flex-col bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden mb-4 lg:mb-0 lg:h-auto" style={{ height: 272 }}>
           <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 shrink-0">
             <div className="flex items-center gap-2">
               <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
