@@ -171,27 +171,14 @@ export default function TrackerPage() {
 
         {/* Kanban side */}
         <div className="w-full min-w-0 lg:flex-1">
-          {/* Stats row — compact strip on mobile, cards on desktop */}
-          <div className="mb-4 sm:mb-5">
-            {/* Mobile: inline dot + label + count */}
-            <div className="flex items-center gap-4 sm:hidden px-1 py-1 overflow-x-auto">
+          {/* Stats row — mobile only */}
+          <div className="mb-4">
+            <div className="flex items-center gap-4 md:hidden px-1 py-1 overflow-x-auto">
               {COLUMNS.map((col) => (
                 <div key={col.key} className="flex items-center gap-1.5 shrink-0">
                   <span className={`w-2 h-2 rounded-full shrink-0 ${col.color}`} />
                   <span className="text-[12px] text-gray-500 font-medium">{col.label}</span>
                   <span className="text-[13px] font-bold text-gray-800">{counts[col.key]}</span>
-                </div>
-              ))}
-            </div>
-            {/* Desktop: card grid */}
-            <div className="hidden sm:grid grid-cols-4 gap-3">
-              {COLUMNS.map((col) => (
-                <div key={col.key} className="bg-white rounded-2xl border border-gray-200 px-4 py-3 shadow-sm">
-                  <div className="flex items-center gap-1.5 mb-1.5">
-                    <span className={`w-1.5 h-1.5 rounded-full ${col.color}`} />
-                    <p className="text-[11px] text-gray-500 font-medium uppercase tracking-wide">{col.label}</p>
-                  </div>
-                  <p className="text-2xl font-bold text-gray-900 leading-none">{counts[col.key]}</p>
                 </div>
               ))}
             </div>
