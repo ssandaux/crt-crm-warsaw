@@ -166,7 +166,7 @@ function HistoryPanel({ skippedList, onRestore, onClose }) {
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
           <div>
             <p className="text-[14px] font-semibold text-gray-900">Skipped history</p>
-            <p className="text-[12px] text-gray-400 mt-0.5">Хранится 24 часа, потом удаляется навсегда</p>
+            <p className="text-[12px] text-gray-400 mt-0.5">Stored for 24 hours, then deleted permanently</p>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-700 transition-colors">
             <IconClose />
@@ -176,7 +176,7 @@ function HistoryPanel({ skippedList, onRestore, onClose }) {
         <div className="flex-1 overflow-y-auto divide-y divide-gray-50">
           {skippedList.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-center px-6">
-              <p className="text-[13px] text-gray-400">Нет скипнутых бизнесов</p>
+              <p className="text-[13px] text-gray-400">No skipped businesses</p>
             </div>
           ) : (
             skippedList.map((biz) => {
@@ -195,7 +195,7 @@ function HistoryPanel({ skippedList, onRestore, onClose }) {
                       </p>
                       {hoursLeft !== null && (
                         <p className={`text-[11px] mt-1 ${hoursLeft <= 3 ? 'text-red-400' : 'text-gray-300'}`}>
-                          Удалится через {hoursLeft} ч.
+                          Deletes in {hoursLeft}h
                         </p>
                       )}
                     </div>
