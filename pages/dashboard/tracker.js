@@ -172,7 +172,7 @@ export default function TrackerPage() {
         {/* Kanban side */}
         <div className="w-full min-w-0 lg:flex-1">
           {/* Stats row — mobile only */}
-          <div className="mb-4">
+          <div className="mb-4 md:mb-0">
             <div className="flex items-center gap-4 md:hidden px-1 py-1 overflow-x-auto">
               {COLUMNS.map((col) => (
                 <div key={col.key} className="flex items-center gap-1.5 shrink-0">
