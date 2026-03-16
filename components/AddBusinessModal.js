@@ -61,9 +61,9 @@ export default function AddBusinessModal({ onClose, onSubmit, onPickOnMap, pendi
   }
 
   return (
-    <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/30 backdrop-blur-[2px]" onClick={onClose}>
+    <div className="fixed inset-0 z-[2000] flex items-end sm:items-center justify-center bg-black/30 backdrop-blur-[2px]" onClick={onClose}>
       <div
-        className="bg-white rounded-2xl border border-gray-200 shadow-2xl w-full max-w-md mx-4 overflow-hidden"
+        className="bg-white sm:rounded-2xl rounded-t-2xl border border-gray-200 shadow-2xl w-full max-w-md sm:mx-4 flex flex-col max-h-[92dvh] overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -77,7 +77,7 @@ export default function AddBusinessModal({ onClose, onSubmit, onPickOnMap, pendi
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="px-5 py-4 space-y-3 max-h-[75vh] overflow-y-auto">
+        <form id="add-biz-form" onSubmit={handleSubmit} className="px-5 py-4 space-y-3 overflow-y-auto flex-1">
           {/* Name */}
           <div>
             <label className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide block mb-1">Name *</label>
@@ -118,7 +118,7 @@ export default function AddBusinessModal({ onClose, onSubmit, onPickOnMap, pendi
           {/* Status */}
           <div>
             <label className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide block mb-1">Status</label>
-            <div className="flex gap-1.5">
+            <div className="grid grid-cols-3 gap-1.5">
               {statuses.map((s) => {
                 const c = STATUS_CONFIG[s];
                 return (
@@ -126,7 +126,7 @@ export default function AddBusinessModal({ onClose, onSubmit, onPickOnMap, pendi
                     key={s}
                     type="button"
                     onClick={() => set('status', s)}
-                    className={`flex-1 py-1.5 rounded-lg text-[11px] font-semibold border transition-all ${
+                    className={`py-1.5 rounded-lg text-[11px] font-semibold border transition-all ${
                       form.status === s
                         ? `${c.badge} border-transparent shadow-sm`
                         : 'bg-white border-gray-200 text-gray-400 hover:border-gray-300 hover:text-gray-600'
@@ -242,23 +242,24 @@ export default function AddBusinessModal({ onClose, onSubmit, onPickOnMap, pendi
             </div>
           )}
 
-          {/* Footer */}
-          <div className="flex items-center gap-2 pt-2 border-t border-gray-100 mt-1">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 py-2 rounded-xl text-[13px] font-medium border border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-700 transition-all bg-white"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="flex-1 py-2 rounded-xl text-[13px] font-semibold bg-gray-900 text-white hover:bg-gray-800 transition-all"
-            >
-              Add business
-            </button>
-          </div>
         </form>
+        {/* Footer — always visible outside scroll area */}
+        <div className="flex items-center gap-2 px-5 py-4 border-t border-gray-100 shrink-0">
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex-1 py-2 rounded-xl text-[13px] font-medium border border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-700 transition-all bg-white"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            form="add-biz-form"
+            className="flex-1 py-2 rounded-xl text-[13px] font-semibold bg-gray-900 text-white hover:bg-gray-800 transition-all"
+          >
+            Add business
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -82,12 +82,12 @@ export function EditModal({ biz, onClose, onSave }) {
           </div>
           <div>
             <label className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide block mb-1">Status</label>
-            <div className="flex gap-1.5">
+            <div className="grid grid-cols-3 gap-1.5">
               {statuses.map((s) => {
                 const c = STATUS_CONFIG[s];
                 return (
                   <button key={s} type="button" onClick={() => set('status', s)}
-                    className={`flex-1 py-1.5 rounded-lg text-[11px] font-semibold border transition-all ${form.status === s ? `${c.badge} border-transparent shadow-sm` : 'bg-white border-gray-200 text-gray-400 hover:border-gray-300 hover:text-gray-600'}`}>
+                    className={`py-1.5 rounded-lg text-[11px] font-semibold border transition-all ${form.status === s ? `${c.badge} border-transparent shadow-sm` : 'bg-white border-gray-200 text-gray-400 hover:border-gray-300 hover:text-gray-600'}`}>
                     {c.label}
                   </button>
                 );
