@@ -128,8 +128,8 @@ export function EditModal({ biz, onClose, onSave }) {
             <div className="min-w-0 overflow-hidden">
               <label className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide block mb-0.5">Reminder</label>
               <input type="date" value={form.followUpDate} onChange={(e) => set('followUpDate', e.target.value)}
-                style={{ WebkitAppearance: 'none', appearance: 'none' }}
-                className="w-full max-w-full px-3 py-2 text-[12px] text-gray-800 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-gray-300 transition" />
+                style={{ WebkitAppearance: 'none', appearance: 'none', minHeight: '38px' }}
+                className="w-full max-w-full px-3 py-2 text-[13px] text-gray-800 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-gray-300 transition" />
             </div>
           </div>
           {/* Row 7: Note */}
