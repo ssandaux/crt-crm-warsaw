@@ -13,7 +13,7 @@ export const STATUS_CONFIG = {
 
 // Pill badge — map info cards, add form toggle
 export function StatusBadge({ status }) {
-  const cfg = STATUS_CONFIG[status];
+  const cfg = STATUS_CONFIG[status] ?? STATUS_CONFIG['untouched'];
   return (
     <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold ${cfg.badge}`}>
       <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
@@ -24,7 +24,7 @@ export function StatusBadge({ status }) {
 
 // Dot + colored text — tables, lists (no background)
 export function StatusDot({ status }) {
-  const cfg = STATUS_CONFIG[status];
+  const cfg = STATUS_CONFIG[status] ?? STATUS_CONFIG['untouched'];
   return (
     <span className="inline-flex items-center gap-2">
       <span className={`w-2 h-2 rounded-full shrink-0 ${cfg.dot}`} />

@@ -4,7 +4,7 @@ import AddBusinessModal from '../../components/AddBusinessModal';
 import PageHeader from '../../components/PageHeader';
 import { useData } from '../../components/DataContext';
 import { types, districts, statuses } from '../../mockData/businesses';
-import { STATUS_CONFIG, selectCls, inputCls, BtnPrimary, BtnSecondary, BtnGhost } from '../../components/ui';
+import { STATUS_CONFIG, StatusSelect, selectCls, inputCls, BtnPrimary, BtnSecondary, BtnGhost } from '../../components/ui';
 import BusinessProfile from '../../components/BusinessProfile';
 import { EditModal, DeleteConfirm } from '../../components/BusinessModals';
 
@@ -47,11 +47,11 @@ function IconClose() {
   return <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>;
 }
 
-// ─── Inline status selector ───────────────────────────────────────────────────
-function StatusSelect({ biz, onChange }) {
+// ─── Inline status selector (per-row, different API from filter StatusSelect) ──
+function InlineStatusSelect({ biz, onChange }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
-  const cfg = STATUS_CONFIG[biz.status];
+  const cfg = biz ? (STATUS_CONFIG[biz.status] ?? STATUS_CONFIG['untouched']) : STATUS_CONFIG['untouched'];
 
   useEffect(() => {
     if (!open) return;
@@ -61,6 +61,8 @@ function StatusSelect({ biz, onChange }) {
     document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);
   }, [open]);
+
+  if (!biz) return null;
 
   return (
     <div ref={ref} className="relative inline-block">
@@ -476,7 +478,7 @@ export default function BusinessesPage() {
                       className="w-3.5 h-3.5 rounded border-gray-300 accent-gray-800 cursor-pointer" />
                   </td>
                   <td className="px-4 py-3"><button onClick={() => setProfileBiz(biz)} className="font-semibold text-gray-900 hover:text-gray-600 text-left transition-colors">{biz.name}</button></td>
-                  <td className="px-4 py-3"><StatusSelect biz={biz} onChange={changeStatus} /></td>
+                  <td className="px-4 py-3"><InlineStatusSelect biz={biz} onChange={changeStatus} /></td>
                   <td className="px-4 py-3 text-gray-500">{biz.type}</td>
                   <td className="px-4 py-3 text-gray-500">{biz.district}</td>
                   <td className="px-4 py-3 text-gray-400 text-[12px]">{biz.email}</td>
