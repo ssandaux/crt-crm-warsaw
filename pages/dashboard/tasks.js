@@ -9,7 +9,7 @@ const STATUSES = [
   { value: 'client',   label: 'Client',   dot: 'bg-blue-500' },
 ];
 
-const SKIP_TTL_DAYS = 7;
+const SKIP_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 const PAGE_SIZES = [10, 25, 50, 100];
 
 const DEFAULT_COL_WIDTHS = {
@@ -166,7 +166,7 @@ function HistoryPanel({ skippedList, onRestore, onClose }) {
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
           <div>
             <p className="text-[14px] font-semibold text-gray-900">Skipped history</p>
-            <p className="text-[12px] text-gray-400 mt-0.5">Хранится {SKIP_TTL_DAYS} дней, потом удаляется навсегда</p>
+            <p className="text-[12px] text-gray-400 mt-0.5">Хранится 24 часа, потом удаляется навсегда</p>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-700 transition-colors">
             <IconClose />
@@ -181,9 +181,8 @@ function HistoryPanel({ skippedList, onRestore, onClose }) {
           ) : (
             skippedList.map((biz) => {
               const skipDate = biz.lastAction ? new Date(biz.lastAction) : null;
-              const daysLeft = skipDate
-                ? SKIP_TTL_DAYS - Math.floor((Date.now() - skipDate.getTime()) / 86400000)
-                : null;
+              const msLeft = skipDate ? (skipDate.getTime() + SKIP_TTL_MS) - Date.now() : null;
+              const hoursLeft = msLeft !== null ? Math.max(0, Math.ceil(msLeft / 3600000)) : null;
 
               return (
                 <div key={biz.id} className="px-5 py-3.5 hover:bg-gray-50/60 transition-colors">
@@ -194,9 +193,9 @@ function HistoryPanel({ skippedList, onRestore, onClose }) {
                         {biz.type || '—'}
                         {biz.address && biz.address !== '—' ? ` · ${biz.address}` : ''}
                       </p>
-                      {daysLeft !== null && (
-                        <p className={`text-[11px] mt-1 ${daysLeft <= 1 ? 'text-red-400' : 'text-gray-300'}`}>
-                          Удалится через {daysLeft} д.
+                      {hoursLeft !== null && (
+                        <p className={`text-[11px] mt-1 ${hoursLeft <= 3 ? 'text-red-400' : 'text-gray-300'}`}>
+                          Удалится через {hoursLeft} ч.
                         </p>
                       )}
                     </div>
@@ -230,10 +229,10 @@ export default function TasksPage() {
     setColWidths((prev) => ({ ...prev, [col]: w }));
   }
 
-  // On load: delete skipped businesses older than 7 days
+  // On load: delete skipped businesses older than 24h
   useEffect(() => {
     if (!ready) return;
-    const cutoff = Date.now() - SKIP_TTL_DAYS * 86400000;
+    const cutoff = Date.now() - SKIP_TTL_MS;
     const expired = businesses.filter((b) => {
       if (b.status !== 'skipped') return false;
       const d = b.lastAction ? new Date(b.lastAction).getTime() : 0;
