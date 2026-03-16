@@ -4,7 +4,7 @@ import AddBusinessModal from '../../components/AddBusinessModal';
 import PageHeader from '../../components/PageHeader';
 import { useData } from '../../components/DataContext';
 import { types, districts, statuses } from '../../mockData/businesses';
-import { STATUS_CONFIG, selectCls, inputCls, BtnPrimary, BtnSecondary, BtnGhost } from '../../components/ui';
+import { STATUS_CONFIG, StatusSelect, selectCls, inputCls, BtnPrimary, BtnSecondary, BtnGhost } from '../../components/ui';
 import BusinessProfile from '../../components/BusinessProfile';
 import { EditModal, DeleteConfirm } from '../../components/BusinessModals';
 
@@ -357,10 +357,11 @@ export default function BusinessesPage() {
               className="w-48 pl-8 pr-3 py-[7px] text-[13px] text-gray-700 bg-white border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent placeholder-gray-400 transition hover:border-gray-300" />
           </div>
           <div className="w-px h-5 bg-gray-200" />
-          <select value={filterStatus} onChange={(e) => { setFilterStatus(e.target.value); setPage(1); }} className={selectCls}>
-            <option value="">All statuses</option>
-            {statuses.map((s) => <option key={s} value={s}>{STATUS_CONFIG[s].label}</option>)}
-          </select>
+          <StatusSelect
+            value={filterStatus}
+            onChange={(v) => { setFilterStatus(v); setPage(1); }}
+            statuses={statuses}
+          />
           <select value={filterType} onChange={(e) => { setFilterType(e.target.value); setPage(1); }} className={selectCls}>
             <option value="">All types</option>
             {types.map((t) => <option key={t} value={t}>{t}</option>)}

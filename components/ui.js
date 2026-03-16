@@ -1,4 +1,5 @@
 // ─── Design system tokens & reusable primitives ───────────────────────────────
+import { useState, useEffect, useRef } from 'react';
 
 // ── Status ────────────────────────────────────────────────────────────────────
 
@@ -73,6 +74,87 @@ export function BtnSecondary({ children, className = '', ...props }) {
     >
       {children}
     </button>
+  );
+}
+
+// ── Status filter dropdown (replaces native <select> for statuses) ────────────
+const STATUS_DOT_COLORS = {
+  client:    'bg-blue-500',
+  agreed:    'bg-emerald-500',
+  contacted: 'bg-amber-400',
+  rejected:  'bg-red-500',
+  untouched: 'bg-gray-400',
+};
+const STATUS_OPTION_STYLES = {
+  client:    'text-blue-600 hover:bg-blue-50',
+  agreed:    'text-emerald-600 hover:bg-emerald-50',
+  contacted: 'text-amber-600 hover:bg-amber-50',
+  rejected:  'text-red-500 hover:bg-red-50',
+  untouched: 'text-gray-600 hover:bg-gray-50',
+};
+
+export function StatusSelect({ value, onChange, statuses = [] }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (!open) return;
+    function onDown(e) { if (ref.current && !ref.current.contains(e.target)) setOpen(false); }
+    document.addEventListener('mousedown', onDown);
+    return () => document.removeEventListener('mousedown', onDown);
+  }, [open]);
+
+  const selectedCfg = value ? STATUS_CONFIG[value] : null;
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="inline-flex items-center gap-2 text-[13px] bg-white border border-gray-200 rounded-lg px-3 py-[7px] outline-none cursor-pointer transition hover:border-gray-300 whitespace-nowrap select-none"
+      >
+        {selectedCfg ? (
+          <>
+            <span className={`w-2 h-2 rounded-full shrink-0 ${STATUS_DOT_COLORS[value]}`} />
+            <span className={`font-medium ${STATUS_OPTION_STYLES[value].split(' ')[0]}`}>{selectedCfg.label}</span>
+          </>
+        ) : (
+          <span className="text-gray-500">All statuses</span>
+        )}
+        <svg xmlns="http://www.w3.org/2000/svg" className={`w-3.5 h-3.5 text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {open && (
+        <div className="absolute left-0 top-[calc(100%+6px)] z-50 bg-white border border-gray-200 rounded-xl shadow-xl py-1.5 min-w-[160px] overflow-hidden">
+          {/* All statuses option */}
+          <button
+            onClick={() => { onChange(''); setOpen(false); }}
+            className={`w-full flex items-center gap-2.5 px-3.5 py-2 text-[13px] font-medium transition-colors text-left ${!value ? 'bg-gray-50 text-gray-900' : 'text-gray-500 hover:bg-gray-50'}`}
+          >
+            <span className="w-2 h-2 rounded-full bg-gray-300" />
+            All statuses
+          </button>
+
+          <div className="my-1 border-t border-gray-100" />
+
+          {statuses.map((s) => {
+            const cfg = STATUS_CONFIG[s];
+            const isActive = value === s;
+            return (
+              <button
+                key={s}
+                onClick={() => { onChange(s); setOpen(false); }}
+                className={`w-full flex items-center gap-2.5 px-3.5 py-2 text-[13px] font-medium transition-colors text-left ${isActive ? `${cfg.badge}` : STATUS_OPTION_STYLES[s]}`}
+              >
+                <span className={`w-2 h-2 rounded-full shrink-0 ${STATUS_DOT_COLORS[s]}`} />
+                {cfg.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
   );
 }
 

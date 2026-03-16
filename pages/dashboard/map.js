@@ -5,7 +5,7 @@ import Layout from '../../components/Layout';
 import PageHeader from '../../components/PageHeader';
 import { useData } from '../../components/DataContext';
 import { districts, statuses } from '../../mockData/businesses';
-import { STATUS_CONFIG, selectCls, inputCls } from '../../components/ui';
+import { STATUS_CONFIG, StatusSelect, selectCls, inputCls } from '../../components/ui';
 import BusinessProfile from '../../components/BusinessProfile';
 import { EditModal, DeleteConfirm } from '../../components/BusinessModals';
 import { importFromGoogle, getImportWaveInfo, TOTAL_WAVES } from '../../lib/importGoogle';
@@ -421,10 +421,11 @@ export default function MapPage() {
 
         <div className="w-px h-5 bg-gray-200" />
 
-        <select value={filterStatus} onChange={(e) => handleFilterStatus(e.target.value)} className={selectCls}>
-          <option value="">All statuses</option>
-          {statuses.map((s) => <option key={s} value={s}>{STATUS_CONFIG[s].label}</option>)}
-        </select>
+        <StatusSelect
+          value={filterStatus}
+          onChange={handleFilterStatus}
+          statuses={statuses}
+        />
 
         <select value={filterDistrict} onChange={(e) => { setFilterDistrict(e.target.value); setSelected(null); }} className={selectCls}>
           <option value="">All districts</option>

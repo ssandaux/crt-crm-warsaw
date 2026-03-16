@@ -137,30 +137,23 @@ function ResizableTh({ width, onResize, children, className = '', isLast = false
   );
 }
 
-// ─── Split button: "Contacted" + chevron for custom status ────────────────
-function ApproveDropdown({ onApprove }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef(null);
-
-  useEffect(() => {
-    if (!open) return;
-    function handleClick(e) {
-      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
-    }
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
-  }, [open]);
-
+// ─── Contacted button ──────────────────────────────────────────────────────
+function ContactedButton({ onApprove, animState }) {
+  const confirming = animState === 'contacted';
   return (
-    <div className="relative inline-flex" ref={ref}>
-      <button
-        onClick={() => onApprove('contacted')}
-        className="inline-flex items-center gap-1.5 px-3.5 py-[7px] text-[12px] font-medium tracking-wide bg-gray-900 text-white hover:bg-gray-800 active:scale-[0.98] transition-all leading-none rounded-md whitespace-nowrap select-none"
-      >
-        <IconCheck />
-        Contacted
-      </button>
-    </div>
+    <button
+      onClick={() => onApprove('contacted')}
+      disabled={confirming}
+      className="inline-flex items-center justify-center gap-1.5 px-3.5 py-[7px] text-[12px] font-medium tracking-wide text-white active:scale-[0.98] leading-none rounded-md whitespace-nowrap select-none"
+      style={{
+        backgroundColor: confirming ? '#f59e0b' : '#111827',
+        transition: 'background-color 200ms ease, transform 100ms ease',
+        minWidth: 100,
+      }}
+    >
+      <IconCheck />
+      {confirming ? 'Done!' : 'Contacted'}
+    </button>
   );
 }
 
@@ -227,7 +220,7 @@ function HistoryPanel({ skippedList, onRestore, onClose }) {
 // ─── Main Page ─────────────────────────────────────────────────────────────
 export default function TasksPage() {
   const { businesses, changeStatus, deleteBusinesses, ready } = useData();
-  const [approving, setApproving]   = useState(new Set());
+  const [rowAnim, setRowAnim]       = useState({}); // { [id]: 'contacted'|'skipping'|'hiding' }
   const [historyOpen, setHistoryOpen] = useState(false);
   const [colWidths, setColWidths]   = useState(DEFAULT_COL_WIDTHS);
   const [page, setPage]             = useState(1);
@@ -272,15 +265,23 @@ export default function TasksPage() {
   };
 
   async function handleApprove(biz, status) {
-    setApproving((prev) => new Set([...prev, biz.id]));
+    if (rowAnim[biz.id]) return;
+    setRowAnim((p) => ({ ...p, [biz.id]: 'contacted' }));
+    await new Promise((r) => setTimeout(r, 520));
+    setRowAnim((p) => ({ ...p, [biz.id]: 'hiding' }));
+    await new Promise((r) => setTimeout(r, 280));
     await changeStatus(biz.id, status);
-    setApproving((prev) => { const n = new Set(prev); n.delete(biz.id); return n; });
+    setRowAnim((p) => { const n = { ...p }; delete n[biz.id]; return n; });
   }
 
   async function handleSkip(biz) {
-    setApproving((prev) => new Set([...prev, biz.id]));
+    if (rowAnim[biz.id]) return;
+    setRowAnim((p) => ({ ...p, [biz.id]: 'skipping' }));
+    await new Promise((r) => setTimeout(r, 350));
+    setRowAnim((p) => ({ ...p, [biz.id]: 'hiding' }));
+    await new Promise((r) => setTimeout(r, 260));
     await changeStatus(biz.id, 'skipped');
-    setApproving((prev) => { const n = new Set(prev); n.delete(biz.id); return n; });
+    setRowAnim((p) => { const n = { ...p }; delete n[biz.id]; return n; });
   }
 
   async function handleRestore(id) {
@@ -377,12 +378,20 @@ export default function TasksPage() {
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {pageRows.map((biz) => {
-                  const url          = normalizeUrl(biz.website);
-                  const isProcessing = approving.has(biz.id);
+                  const url      = normalizeUrl(biz.website);
+                  const anim     = rowAnim[biz.id];
+                  const hiding   = anim === 'hiding';
+                  const skipping = anim === 'skipping';
                   return (
                     <tr
                       key={biz.id}
-                      className={`transition-colors ${isProcessing ? 'opacity-40 pointer-events-none' : 'hover:bg-gray-50/70'}`}
+                      className={`${!anim ? 'hover:bg-gray-50/70' : 'pointer-events-none'}`}
+                      style={{
+                        transition: 'opacity 260ms ease, transform 260ms ease, background-color 200ms ease',
+                        opacity:    hiding ? 0 : 1,
+                        transform:  hiding ? 'translateX(12px)' : 'translateX(0)',
+                        backgroundColor: skipping ? 'rgba(239,68,68,0.07)' : undefined,
+                      }}
                     >
                       {/* Business */}
                       <td className="px-4 py-3 overflow-hidden">
@@ -444,28 +453,25 @@ export default function TasksPage() {
                       {/* Actions */}
                       <td className="px-4 py-3 overflow-visible">
                         <div className="flex items-center justify-end gap-2 whitespace-nowrap">
-                          {isProcessing ? (
-                            <span className="text-[12px] text-gray-400 italic">Saving…</span>
-                          ) : (
-                            <>
-                              <a
-                                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([biz.name, biz.address].filter(Boolean).join(' '))}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                title="Open in Google Maps"
-                                className="inline-flex items-center gap-1 px-2.5 py-[7px] rounded-md text-[12px] font-medium text-gray-400 hover:text-blue-500 hover:bg-blue-50 active:scale-[0.98] transition-all whitespace-nowrap select-none"
-                              >
-                                <IconGoogleMaps />
-                              </a>
-                              <ApproveDropdown onApprove={(status) => handleApprove(biz, status)} />
-                              <button
-                                onClick={() => handleSkip(biz)}
-                                className="inline-flex items-center gap-1 px-2.5 py-[7px] rounded-md text-[12px] font-medium text-gray-400 hover:text-gray-700 hover:bg-gray-100 active:scale-[0.98] transition-all whitespace-nowrap select-none"
-                              >
-                                <IconSkip /> Skip
-                              </button>
-                            </>
-                          )}
+                          <a
+                            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([biz.name, biz.address].filter(Boolean).join(' '))}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title="Open in Google Maps"
+                            className="inline-flex items-center gap-1 px-2.5 py-[7px] rounded-md text-[12px] font-medium text-gray-400 hover:text-blue-500 hover:bg-blue-50 active:scale-[0.98] transition-all whitespace-nowrap select-none"
+                          >
+                            <IconGoogleMaps />
+                          </a>
+                          <ContactedButton
+                            animState={anim}
+                            onApprove={(status) => handleApprove(biz, status)}
+                          />
+                          <button
+                            onClick={() => handleSkip(biz)}
+                            className="inline-flex items-center gap-1 px-2.5 py-[7px] rounded-md text-[12px] font-medium text-gray-400 hover:text-red-500 hover:bg-red-50 active:scale-[0.98] transition-all whitespace-nowrap select-none"
+                          >
+                            <IconSkip /> Skip
+                          </button>
                         </div>
                       </td>
                     </tr>
