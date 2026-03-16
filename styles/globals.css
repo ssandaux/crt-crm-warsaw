@@ -33,7 +33,6 @@ svg *, img { transition: none; }
 
 /* Page background */
 html.dark .bg-\[\#f8f9fb\] { background-color: #111111 !important; }
-html.dark .dark\:bg-\[#111111\] { background-color: #111111 !important; }
 
 /* White surfaces → graphite cards */
 html.dark .bg-white { background-color: #1e1e1e !important; }
