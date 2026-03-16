@@ -52,89 +52,92 @@ export function EditModal({ biz, onClose, onSave }) {
   return (
     <div className="fixed inset-0 z-[2000] flex items-end sm:items-center justify-center bg-black/30 backdrop-blur-[2px]" onClick={onClose}>
       <div className="bg-white sm:rounded-2xl rounded-t-2xl border border-gray-200 shadow-2xl w-full max-w-lg sm:mx-4 flex flex-col max-h-[92dvh] overflow-hidden" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-gray-100 shrink-0">
+        <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b border-gray-100 shrink-0">
           <div>
-            <p className="text-[15px] font-bold text-gray-900">Edit Business</p>
-            <p className="text-[12px] text-gray-400 mt-0.5">{biz.name}</p>
+            <p className="text-[14px] font-bold text-gray-900">Edit Business</p>
+            <p className="text-[11px] text-gray-400 mt-0.5 truncate max-w-[240px]">{biz.name}</p>
           </div>
           <button onClick={onClose} className="text-gray-300 hover:text-gray-500 transition-colors"><IconClose /></button>
         </div>
-        <form id="edit-biz-form" onSubmit={handleSubmit} className="px-5 py-4 space-y-3 overflow-y-auto flex-1">
+        <form id="edit-biz-form" onSubmit={handleSubmit} className="px-4 py-3 space-y-2 overflow-y-auto flex-1">
+          {/* Row 1: Name */}
           <div>
-            <label className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide block mb-1">Name *</label>
-            <input type="text" value={form.name} onChange={(e) => set('name', e.target.value)} className={`${inputCls} w-full ${errors.name ? 'border-red-300' : ''}`} />
+            <label className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide block mb-0.5">Name *</label>
+            <input type="text" value={form.name} onChange={(e) => set('name', e.target.value)} className={`w-full px-3 py-2 text-[13px] text-gray-800 bg-gray-50 border rounded-lg outline-none focus:ring-2 focus:ring-gray-300 focus:bg-white placeholder-gray-400 transition ${errors.name ? 'border-red-300' : 'border-gray-200'}`} />
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          {/* Row 2: Type + District */}
+          <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide block mb-1">Type</label>
-              <select value={form.type} onChange={(e) => set('type', e.target.value)} className={`${selectCls} w-full`}>
+              <label className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide block mb-0.5">Type</label>
+              <select value={form.type} onChange={(e) => set('type', e.target.value)} className="w-full px-3 py-2 text-[12px] text-gray-700 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-gray-300 appearance-none">
                 <option value="">Select...</option>
                 {types.map((t) => <option key={t} value={t}>{t}</option>)}
               </select>
             </div>
             <div>
-              <label className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide block mb-1">District *</label>
-              <select value={form.district} onChange={(e) => set('district', e.target.value)} className={`${selectCls} w-full ${errors.district ? 'border-red-300' : ''}`}>
+              <label className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide block mb-0.5">District *</label>
+              <select value={form.district} onChange={(e) => set('district', e.target.value)} className={`w-full px-3 py-2 text-[12px] text-gray-700 bg-gray-50 border rounded-lg outline-none focus:ring-2 focus:ring-gray-300 appearance-none ${errors.district ? 'border-red-300' : 'border-gray-200'}`}>
                 <option value="">Select...</option>
                 {districts.map((d) => <option key={d} value={d}>{d}</option>)}
               </select>
             </div>
           </div>
+          {/* Row 3: Status */}
           <div>
-            <label className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide block mb-1">Status</label>
-            <div className="grid grid-cols-3 gap-1.5">
+            <label className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide block mb-0.5">Status</label>
+            <div className="grid grid-cols-3 gap-1">
               {statuses.map((s) => {
                 const c = STATUS_CONFIG[s];
                 return (
                   <button key={s} type="button" onClick={() => set('status', s)}
-                    className={`py-1.5 rounded-lg text-[11px] font-semibold border transition-all ${form.status === s ? `${c.badge} border-transparent shadow-sm` : 'bg-white border-gray-200 text-gray-400 hover:border-gray-300 hover:text-gray-600'}`}>
+                    className={`py-1 rounded-lg text-[11px] font-semibold border transition-all ${form.status === s ? `${c.badge} border-transparent shadow-sm` : 'bg-white border-gray-200 text-gray-400'}`}>
                     {c.label}
                   </button>
                 );
               })}
             </div>
           </div>
+          {/* Row 4: Address */}
           <div>
-            <label className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide block mb-1">
+            <label className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide block mb-0.5">
               Address
-              {geoStatus === 'loading' && <span className="ml-2 text-gray-400 font-normal normal-case">Locating…</span>}
-              {geoStatus === 'found'   && <span className="ml-2 text-emerald-500 font-normal normal-case">Location updated</span>}
-              {geoStatus === 'error'   && <span className="ml-2 text-amber-500 font-normal normal-case">Address not found</span>}
+              {geoStatus === 'loading' && <span className="ml-1 text-gray-400 font-normal normal-case">Locating…</span>}
+              {geoStatus === 'found'   && <span className="ml-1 text-emerald-500 font-normal normal-case">Updated</span>}
+              {geoStatus === 'error'   && <span className="ml-1 text-amber-500 font-normal normal-case">Not found</span>}
             </label>
-            <input
-              type="text"
-              value={form.address}
-              onChange={(e) => set('address', e.target.value)}
-              onBlur={handleAddressBlur}
-              className={`${inputCls} w-full`}
-            />
+            <input type="text" value={form.address} onChange={(e) => set('address', e.target.value)} onBlur={handleAddressBlur}
+              className="w-full px-3 py-2 text-[13px] text-gray-800 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-gray-300 focus:bg-white placeholder-gray-400 transition" />
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          {/* Row 5: Phone + Email */}
+          <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide block mb-1">Phone</label>
-              <input type="text" value={form.phone} onChange={(e) => set('phone', e.target.value)} className={`${inputCls} w-full`} />
+              <label className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide block mb-0.5">Phone</label>
+              <input type="text" value={form.phone} onChange={(e) => set('phone', e.target.value)} className="w-full px-3 py-2 text-[13px] text-gray-800 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-gray-300 transition" />
             </div>
             <div>
-              <label className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide block mb-1">Email</label>
-              <input type="email" value={form.email} onChange={(e) => set('email', e.target.value)} className={`${inputCls} w-full`} />
+              <label className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide block mb-0.5">Email</label>
+              <input type="email" value={form.email} onChange={(e) => set('email', e.target.value)} className="w-full px-3 py-2 text-[13px] text-gray-800 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-gray-300 transition" />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          {/* Row 6: Next Action + Reminder Date — stacked to avoid date overflow */}
+          <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide block mb-1">Next Action</label>
-              <input type="text" placeholder="e.g. Call Friday…" value={form.nextAction} onChange={(e) => set('nextAction', e.target.value)} className={`${inputCls} w-full`} />
+              <label className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide block mb-0.5">Next Action</label>
+              <input type="text" placeholder="Call Friday…" value={form.nextAction} onChange={(e) => set('nextAction', e.target.value)} className="w-full px-3 py-2 text-[13px] text-gray-800 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-gray-300 transition placeholder-gray-400" />
             </div>
-            <div>
-              <label className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide block mb-1">Reminder Date</label>
-              <input type="date" value={form.followUpDate} onChange={(e) => set('followUpDate', e.target.value)} className={`${inputCls} w-full`} />
+            <div className="min-w-0">
+              <label className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide block mb-0.5">Reminder</label>
+              <input type="date" value={form.followUpDate} onChange={(e) => set('followUpDate', e.target.value)}
+                className="w-full min-w-0 px-2 py-2 text-[12px] text-gray-800 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-gray-300 transition" />
             </div>
           </div>
+          {/* Row 7: Note */}
           <div>
-            <label className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide block mb-1">Note</label>
-            <textarea rows={2} value={form.note} onChange={(e) => set('note', e.target.value)} className={`${inputCls} w-full resize-none`} />
+            <label className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide block mb-0.5">Note</label>
+            <textarea rows={1} value={form.note} onChange={(e) => set('note', e.target.value)} className="w-full px-3 py-2 text-[13px] text-gray-800 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-gray-300 transition resize-none" />
           </div>
         </form>
-        <div className="flex gap-2 px-5 py-4 border-t border-gray-100 shrink-0">
+        <div className="flex gap-2 px-4 py-3 border-t border-gray-100 shrink-0">
           <button type="button" onClick={onClose} className="flex-1 py-2 rounded-xl text-[13px] font-medium border border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-700 transition-all bg-white">Cancel</button>
           <button type="submit" form="edit-biz-form" className="flex-1 py-2 rounded-xl text-[13px] font-semibold bg-gray-900 text-white hover:bg-gray-800 transition-all">Save changes</button>
         </div>
