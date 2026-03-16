@@ -93,7 +93,7 @@ const STATUS_OPTION_STYLES = {
   untouched: 'text-gray-600 hover:bg-gray-50',
 };
 
-export function StatusSelect({ value, onChange, statuses = [] }) {
+export function StatusSelect({ value, onChange, statuses = [], fullWidth = false }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
@@ -107,10 +107,10 @@ export function StatusSelect({ value, onChange, statuses = [] }) {
   const selectedCfg = value ? STATUS_CONFIG[value] : null;
 
   return (
-    <div className="relative" ref={ref}>
+    <div className={`relative${fullWidth ? ' w-full' : ''}`} ref={ref}>
       <button
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex items-center gap-2 text-[13px] bg-white border border-gray-200 rounded-lg px-3 py-[7px] outline-none cursor-pointer transition hover:border-gray-300 whitespace-nowrap select-none"
+        className={`${fullWidth ? 'w-full justify-between' : 'inline-flex'} flex items-center gap-2 text-[13px] bg-white border border-gray-200 rounded-lg px-3 py-[7px] outline-none cursor-pointer transition hover:border-gray-300 whitespace-nowrap select-none`}
       >
         {selectedCfg ? (
           <>

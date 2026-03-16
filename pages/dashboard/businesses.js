@@ -351,30 +351,39 @@ export default function BusinessesPage() {
           ))}
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 sm:flex-1 sm:justify-end">
-          <div className="relative flex-1 sm:flex-none">
+        {/* Mobile: search full-width, then 3 dropdowns in a row below */}
+        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2 sm:flex-1 sm:justify-end">
+          {/* Search — full width on mobile */}
+          <div className="relative w-full sm:w-auto sm:flex-none">
             <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
             <input type="text" placeholder="Search..." value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1); }}
               className="w-full sm:w-48 pl-8 pr-3 py-[7px] text-[13px] text-gray-700 bg-white border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent placeholder-gray-400 transition hover:border-gray-300" />
           </div>
-          <div className="w-px h-5 bg-gray-200" />
-          <StatusSelect
-            value={filterStatus}
-            onChange={(v) => { setFilterStatus(v); setPage(1); }}
-            statuses={statuses}
-          />
-          <select value={filterType} onChange={(e) => { setFilterType(e.target.value); setPage(1); }} className={selectCls}>
-            <option value="">All types</option>
-            {types.map((t) => <option key={t} value={t}>{t}</option>)}
-          </select>
-          <select value={filterDistrict} onChange={(e) => { setFilterDistrict(e.target.value); setPage(1); }} className={selectCls}>
-            <option value="">All districts</option>
-            {districts.map((d) => <option key={d} value={d}>{d}</option>)}
-          </select>
+
+          {/* 3 dropdowns — equal width row on mobile */}
+          <div className="flex gap-2 w-full sm:w-auto sm:contents">
+            <div className="flex-1 sm:flex-none">
+              <StatusSelect
+                value={filterStatus}
+                onChange={(v) => { setFilterStatus(v); setPage(1); }}
+                statuses={statuses}
+                fullWidth
+              />
+            </div>
+            <select value={filterType} onChange={(e) => { setFilterType(e.target.value); setPage(1); }} className={`flex-1 sm:flex-none ${selectCls}`}>
+              <option value="">All types</option>
+              {types.map((t) => <option key={t} value={t}>{t}</option>)}
+            </select>
+            <select value={filterDistrict} onChange={(e) => { setFilterDistrict(e.target.value); setPage(1); }} className={`flex-1 sm:flex-none ${selectCls}`}>
+              <option value="">All districts</option>
+              {districts.map((d) => <option key={d} value={d}>{d}</option>)}
+            </select>
+          </div>
+
           {hasFilters && (
             <button onClick={() => { setSearch(''); setFilterStatus(''); setFilterType(''); setFilterDistrict(''); setPage(1); }}
-              className="text-[12px] text-gray-400 hover:text-gray-700 flex items-center gap-1 transition-colors">
+              className="text-[12px] text-gray-400 hover:text-gray-700 flex items-center gap-1 transition-colors self-start sm:self-auto">
               <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
               Clear
             </button>
