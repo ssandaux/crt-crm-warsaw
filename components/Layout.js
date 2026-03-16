@@ -20,7 +20,9 @@ export default function Layout({ children, fullWidth }) {
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
-          <img src="/wordmark-black.svg" alt="CRT Agency" className="h-5 w-auto object-contain dark:invert" />
+          <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: '18px', letterSpacing: '-0.01em' }} className="text-gray-900 dark:text-white">
+            CRT Agency
+          </span>
         </div>
 
         <div className={`flex-1 px-4 py-4 sm:px-8 sm:py-8 w-full ${fullWidth ? '' : 'max-w-7xl mx-auto'}`}>

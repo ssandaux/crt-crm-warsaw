@@ -110,7 +110,9 @@ export default function Sidebar({ mobileOpen = false, setMobileOpen = () => {} }
       {/* Company header */}
       <div className="px-5 py-4 border-b border-gray-100 dark:border-[#2a2a2a] flex items-center gap-3 shrink-0">
         <img src="/logo-black.png" alt="Icon" className="h-8 w-8 object-contain shrink-0 dark:invert" />
-        <img src="/wordmark-black.svg" alt="CRT Agency" className="h-6 w-auto object-contain dark:invert flex-1 min-w-0" />
+        <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: '17px', letterSpacing: '-0.01em' }} className="text-gray-900 dark:text-white leading-none">
+          CRT Agency
+        </span>
       </div>
 
       {/* Navigation */}

@@ -5,6 +5,9 @@ export default function Document() {
     <Html lang="en" suppressHydrationWarning>
       <Head>
         <link rel="icon" href="/logo-black.png" type="image/png" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700&display=swap" rel="stylesheet" />
         <title>CRM by CRT Agency</title>
         {/* Anti-flash: apply saved theme before first paint */}
         <script dangerouslySetInnerHTML={{ __html: `(function(){try{if(localStorage.getItem('crm_theme')==='dark')document.documentElement.classList.add('dark');}catch(e){}})();` }} />
