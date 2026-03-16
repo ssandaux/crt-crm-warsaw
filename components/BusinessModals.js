@@ -59,7 +59,7 @@ export function EditModal({ biz, onClose, onSave }) {
           </div>
           <button onClick={onClose} className="text-gray-300 hover:text-gray-500 transition-colors"><IconClose /></button>
         </div>
-        <form id="edit-biz-form" onSubmit={handleSubmit} className="px-4 py-3 space-y-2 overflow-y-auto flex-1">
+        <form id="edit-biz-form" onSubmit={handleSubmit} noValidate className="px-4 py-3 space-y-2 overflow-y-auto flex-1">
           {/* Row 1: Name */}
           <div>
             <label className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide block mb-0.5">Name *</label>

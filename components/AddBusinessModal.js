@@ -77,7 +77,7 @@ export default function AddBusinessModal({ onClose, onSubmit, onPickOnMap, pendi
           </button>
         </div>
 
-        <form id="add-biz-form" onSubmit={handleSubmit} className="px-5 py-4 space-y-3 overflow-y-auto flex-1">
+        <form id="add-biz-form" onSubmit={handleSubmit} noValidate className="px-5 py-4 space-y-3 overflow-y-auto flex-1">
           {/* Name */}
           <div>
             <label className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide block mb-1">Name *</label>
