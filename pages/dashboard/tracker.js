@@ -157,7 +157,7 @@ export default function TrackerPage() {
       >
         <button
           onClick={() => openAdd()}
-          className="inline-flex items-center gap-1.5 px-4 py-2.5 sm:px-5 sm:py-2.5 rounded-xl text-[14px] sm:text-[14px] font-semibold bg-gray-900 text-white hover:bg-gray-800 transition-colors"
+          className="md:hidden inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-[14px] font-semibold bg-gray-900 text-white hover:bg-gray-800 transition-colors"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
