@@ -4,7 +4,7 @@ import AddBusinessModal from '../../components/AddBusinessModal';
 import PageHeader from '../../components/PageHeader';
 import { useData } from '../../components/DataContext';
 import { types, districts, statuses } from '../../mockData/businesses';
-import { STATUS_CONFIG, StatusSelect, selectCls, inputCls, BtnPrimary, BtnSecondary, BtnGhost } from '../../components/ui';
+import { STATUS_CONFIG, selectCls, inputCls, BtnPrimary, BtnSecondary, BtnGhost } from '../../components/ui';
 import BusinessProfile from '../../components/BusinessProfile';
 import { EditModal, DeleteConfirm } from '../../components/BusinessModals';
 
