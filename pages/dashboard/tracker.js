@@ -153,6 +153,7 @@ export default function TrackerPage() {
         title="Task Tracker"
         subtitle="Internal tasks and to-dos for the team."
         count={tasks.length}
+        className="mb-3 sm:mb-6"
       >
         <button
           onClick={() => openAdd()}
@@ -330,8 +331,8 @@ export default function TrackerPage() {
         </div>
 
         {/* Notes panel */}
-        <div className="w-full lg:w-72 lg:shrink-0 flex flex-col bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden" style={{ minHeight: 320 }}>
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+        <div className="w-full lg:w-72 lg:shrink-0 flex flex-col bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden mb-4 lg:mb-0" style={{ minHeight: 'auto', height: 320 }}>
+          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 shrink-0">
             <div className="flex items-center gap-2">
               <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -347,7 +348,6 @@ export default function TrackerPage() {
             onChange={(e) => handleNotesChange(e.target.value)}
             placeholder="Write notes, ideas, reminders…"
             className="flex-1 w-full px-4 py-3 text-[13px] text-gray-700 placeholder:text-gray-300 leading-relaxed resize-none focus:outline-none"
-            style={{ minHeight: 260 }}
           />
         </div>
 
