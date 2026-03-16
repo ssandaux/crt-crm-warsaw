@@ -100,21 +100,21 @@ export default function Sidebar({ mobileOpen = false, setMobileOpen = () => {} }
       )}
 
     <aside className={`
-      fixed inset-y-0 left-0 z-50 w-[220px] h-screen
+      fixed inset-y-0 left-0 z-50 w-[240px] h-[100dvh]
       bg-white dark:bg-[#191919] border-r border-gray-200 dark:border-[#2a2a2a]
       flex flex-col select-none transition-transform duration-300 ease-in-out
       ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}
-      sm:static sm:translate-x-0 sm:shrink-0 sm:z-auto
+      sm:static sm:translate-x-0 sm:shrink-0 sm:z-auto sm:w-[220px] sm:h-screen
     `}>
 
       {/* Company header */}
-      <div className="px-4 py-3.5 border-b border-gray-100 dark:border-[#2a2a2a] flex items-center gap-2">
-        <img src="/logo-black.png" alt="Icon" className="h-7 w-auto object-contain shrink-0 dark:invert" />
-        <img src="/wordmark-black.svg" alt="CRT Agency" className="h-6 w-auto object-contain dark:invert" />
+      <div className="px-5 py-4 border-b border-gray-100 dark:border-[#2a2a2a] flex items-center gap-3 shrink-0">
+        <img src="/logo-black.png" alt="Icon" className="h-8 w-8 object-contain shrink-0 dark:invert" />
+        <img src="/wordmark-black.svg" alt="CRT Agency" className="h-6 w-auto object-contain dark:invert flex-1 min-w-0" />
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-2.5 pt-3 pb-2 overflow-y-auto">
+      <nav className="flex-1 px-2.5 pt-3 pb-2 overflow-y-auto min-h-0">
         {navGroups.map((group) => (
           <div key={group.label} className="mb-3">
             <p className="px-2 mb-1 text-[10px] font-semibold text-gray-400 uppercase tracking-widest">
@@ -152,7 +152,7 @@ export default function Sidebar({ mobileOpen = false, setMobileOpen = () => {} }
       </nav>
 
       {/* Theme toggle */}
-      <div className="px-3 pb-1">
+      <div className="px-3 pb-1 shrink-0">
         <button
           onClick={toggle}
           className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-gray-500 dark:text-[#737373] hover:bg-gray-50 dark:hover:bg-[#252525] transition-colors"
@@ -179,7 +179,7 @@ export default function Sidebar({ mobileOpen = false, setMobileOpen = () => {} }
       </div>
 
       {/* User footer */}
-      <div className="px-3 py-3 border-t border-gray-100 dark:border-[#2a2a2a]">
+      <div className="px-3 py-3 border-t border-gray-100 dark:border-[#2a2a2a] shrink-0">
         <div className="flex items-center gap-2.5 px-1">
           <div className="w-7 h-7 rounded-full overflow-hidden shrink-0 flex items-center justify-center bg-gray-100">
             <img src="/logo-black.png" alt="Logo" className="w-5 h-5 object-contain dark:invert" />
