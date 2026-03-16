@@ -95,8 +95,8 @@ export default function FollowUpsPage() {
                 </div>
 
                 {/* Date */}
-                <span className={`text-[12px] font-semibold shrink-0 mt-0.5 ${overdueBiz ? 'text-red-500' : todayBiz ? 'text-amber-500' : 'text-gray-500'}`}>
-                  {overdueBiz && <span className="mr-1">⚠</span>}
+                <span className={`text-[12px] font-semibold shrink-0 mt-0.5 ${overdueBiz || todayBiz ? 'text-red-500' : 'text-gray-500'}`}>
+                  {(overdueBiz || todayBiz) && <span className="mr-1">⚠</span>}
                   {fmt(biz.followUpDate)}
                 </span>
               </div>
@@ -133,7 +133,7 @@ export default function FollowUpsPage() {
       ) : (
         <>
           <Section title="Overdue" rows={overdue} accent="text-red-400" />
-          <Section title="Today" rows={today} accent="text-amber-500" />
+          <Section title="Today" rows={today} accent="text-red-500" />
           <Section title="Upcoming" rows={upcoming} accent="text-gray-400" />
         </>
       )}

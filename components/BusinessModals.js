@@ -50,16 +50,16 @@ export function EditModal({ biz, onClose, onSave }) {
   }
 
   return (
-    <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/30 backdrop-blur-[2px]" onClick={onClose}>
-      <div className="bg-white rounded-2xl border border-gray-200 shadow-2xl w-full max-w-lg mx-4 overflow-hidden" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-gray-100">
+    <div className="fixed inset-0 z-[2000] flex items-end sm:items-center justify-center bg-black/30 backdrop-blur-[2px]" onClick={onClose}>
+      <div className="bg-white sm:rounded-2xl rounded-t-2xl border border-gray-200 shadow-2xl w-full max-w-lg sm:mx-4 flex flex-col max-h-[92dvh] overflow-hidden" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-gray-100 shrink-0">
           <div>
             <p className="text-[15px] font-bold text-gray-900">Edit Business</p>
             <p className="text-[12px] text-gray-400 mt-0.5">{biz.name}</p>
           </div>
           <button onClick={onClose} className="text-gray-300 hover:text-gray-500 transition-colors"><IconClose /></button>
         </div>
-        <form onSubmit={handleSubmit} className="px-5 py-4 space-y-3 max-h-[70vh] overflow-y-auto">
+        <form id="edit-biz-form" onSubmit={handleSubmit} className="px-5 py-4 space-y-3 overflow-y-auto flex-1">
           <div>
             <label className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide block mb-1">Name *</label>
             <input type="text" value={form.name} onChange={(e) => set('name', e.target.value)} className={`${inputCls} w-full ${errors.name ? 'border-red-300' : ''}`} />
@@ -133,11 +133,11 @@ export function EditModal({ biz, onClose, onSave }) {
             <label className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide block mb-1">Note</label>
             <textarea rows={2} value={form.note} onChange={(e) => set('note', e.target.value)} className={`${inputCls} w-full resize-none`} />
           </div>
-          <div className="flex gap-2 pt-2 border-t border-gray-100">
-            <button type="button" onClick={onClose} className="flex-1 py-2 rounded-xl text-[13px] font-medium border border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-700 transition-all bg-white">Cancel</button>
-            <button type="submit" className="flex-1 py-2 rounded-xl text-[13px] font-semibold bg-gray-900 text-white hover:bg-gray-800 transition-all">Save changes</button>
-          </div>
         </form>
+        <div className="flex gap-2 px-5 py-4 border-t border-gray-100 shrink-0">
+          <button type="button" onClick={onClose} className="flex-1 py-2 rounded-xl text-[13px] font-medium border border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-700 transition-all bg-white">Cancel</button>
+          <button type="submit" form="edit-biz-form" className="flex-1 py-2 rounded-xl text-[13px] font-semibold bg-gray-900 text-white hover:bg-gray-800 transition-all">Save changes</button>
+        </div>
       </div>
     </div>
   );

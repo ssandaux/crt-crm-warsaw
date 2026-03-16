@@ -293,7 +293,7 @@ export default function BusinessesPage() {
         className="mb-4"
         action={
           <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 w-full sm:w-auto">
-            <button onClick={() => setShowAddModal(true)} className="inline-flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-800 text-white text-[13px] font-semibold px-4 py-2 rounded-lg transition-colors">
+            <button onClick={() => setShowAddModal(true)} className="inline-flex items-center justify-center gap-2 text-[13px] font-medium text-gray-600 bg-white border border-gray-200 hover:border-gray-300 hover:text-gray-800 px-4 py-2 rounded-lg transition-colors">
               <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
               Add business
             </button>
@@ -498,11 +498,13 @@ export default function BusinessesPage() {
                   </td>
                   <td className="px-4 py-3 text-[12px] whitespace-nowrap">
                     {biz.followUpDate ? (() => {
+                      const today = biz.followUpDate === new Date().toISOString().split('T')[0];
                       const overdue = new Date(biz.followUpDate) < new Date(new Date().toDateString());
+                      const isUrgent = today || overdue;
                       return (
-                        <span className={overdue ? 'text-red-500 font-medium' : 'text-gray-400'}>
+                        <span className={isUrgent ? 'text-red-500 font-medium' : 'text-gray-400'}>
                           {new Date(biz.followUpDate + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
-                          {overdue && ' ·'}
+                          {isUrgent && ' ·'}
                         </span>
                       );
                     })() : <span className="text-gray-200">—</span>}

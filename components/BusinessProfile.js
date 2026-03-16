@@ -231,8 +231,8 @@ export default function BusinessProfile({ biz, onClose, onEdit, onDelete, onStat
       {/* Backdrop */}
       {!noBackdrop && <div className="fixed inset-0 z-[1500] bg-black/10" onClick={onClose} />}
 
-      {/* Panel */}
-      <div className="fixed top-0 right-0 h-screen w-[300px] bg-white border-l border-gray-200 shadow-2xl z-[1600] flex flex-col overflow-hidden">
+      {/* Panel — full-screen bottom sheet on mobile, side panel on desktop */}
+      <div className="fixed bottom-0 left-0 right-0 sm:bottom-auto sm:top-0 sm:left-auto sm:right-0 sm:h-screen w-full sm:w-[300px] max-h-[92dvh] sm:max-h-none bg-white sm:border-l border-t sm:border-t-0 border-gray-200 shadow-2xl z-[1600] flex flex-col overflow-hidden rounded-t-2xl sm:rounded-none">
 
         {/* Header */}
         <div className="px-5 pt-5 pb-4 border-b border-gray-100 shrink-0">
