@@ -182,39 +182,16 @@ export default function OverviewPage() {
       <button
         onClick={() => setImportConfirm(true)}
         disabled={!isLoaded || importing}
-        className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-[13px] font-semibold bg-gray-900 text-white hover:bg-gray-800 transition-all disabled:opacity-50 mb-4"
+        className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-[14px] font-medium border border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:text-gray-800 transition-all disabled:opacity-50 mb-2"
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
         </svg>
         Import from Google
       </button>
-
-      {/* Quick links */}
-      <div className="grid grid-cols-2 gap-3">
-        <Link href="/dashboard/businesses" className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 flex items-center gap-3 hover:border-gray-300 transition-all">
-          <span className="w-8 h-8 rounded-xl bg-gray-100 flex items-center justify-center shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-            </svg>
-          </span>
-          <div>
-            <p className="text-[13px] font-semibold text-gray-800">Businesses</p>
-            <p className="text-[11px] text-gray-400">{stats.total} total</p>
-          </div>
-        </Link>
-        <Link href="/dashboard/followups" className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 flex items-center gap-3 hover:border-gray-300 transition-all">
-          <span className="w-8 h-8 rounded-xl bg-gray-100 flex items-center justify-center shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-          </span>
-          <div>
-            <p className="text-[13px] font-semibold text-gray-800">Reminders</p>
-            <p className="text-[11px] text-gray-400">Follow-ups</p>
-          </div>
-        </Link>
-      </div>
+      <p className="text-[11px] text-gray-400 text-center mb-6">
+        До 1 000 новых бизнесов за один импорт · Лимит базы данных: 10 000
+      </p>
     </Layout>
   );
 }
