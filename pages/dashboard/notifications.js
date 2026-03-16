@@ -66,7 +66,7 @@ export default function NotificationsPage() {
             const meta = TYPE_META[ev.type] ?? { label: ev.type, color: 'bg-gray-100 text-gray-600' };
             const statusCfg = STATUS_CONFIG[ev.detail];
             return (
-              <div key={ev.id} className={`flex items-start gap-3.5 px-5 py-4 ${i > 0 ? 'border-t border-gray-50' : ''}`}>
+              <div key={ev.id} className={`flex items-start gap-3.5 px-5 py-4 ${i > 0 ? 'border-t border-gray-100' : ''}`}>
                 {/* Type badge */}
                 <span className={`mt-0.5 shrink-0 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wide ${meta.color}`}>
                   {meta.label}

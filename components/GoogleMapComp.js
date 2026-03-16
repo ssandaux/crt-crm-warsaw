@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
+import { useTheme } from './ThemeContext';
 
 const LIBRARIES = ['places'];
 
@@ -12,6 +13,23 @@ const STATUS_COLORS = {
 };
 
 const WARSAW_CENTER = { lat: 52.2297, lng: 21.0122 };
+
+const DARK_BASE = [
+  { elementType: 'geometry',              stylers: [{ color: '#1a1a1a' }] },
+  { elementType: 'labels.text.fill',      stylers: [{ color: '#757575' }] },
+  { elementType: 'labels.text.stroke',    stylers: [{ color: '#1a1a1a' }] },
+  { featureType: 'administrative',        elementType: 'geometry',            stylers: [{ color: '#333333' }] },
+  { featureType: 'administrative.locality', elementType: 'labels.text.fill',  stylers: [{ color: '#aaaaaa' }] },
+  { featureType: 'road',                  elementType: 'geometry.fill',       stylers: [{ color: '#2c2c2c' }] },
+  { featureType: 'road',                  elementType: 'labels.text.fill',    stylers: [{ color: '#7a7a7a' }] },
+  { featureType: 'road.arterial',         elementType: 'geometry',            stylers: [{ color: '#373737' }] },
+  { featureType: 'road.highway',          elementType: 'geometry',            stylers: [{ color: '#424242' }] },
+  { featureType: 'road.local',            elementType: 'labels.text.fill',    stylers: [{ color: '#606060' }] },
+  { featureType: 'poi.park',              elementType: 'geometry',            stylers: [{ color: '#141414' }] },
+  { featureType: 'poi.park',              elementType: 'labels.text.fill',    stylers: [{ color: '#555555' }] },
+  { featureType: 'water',                 elementType: 'geometry',            stylers: [{ color: '#0d0d0d' }] },
+  { featureType: 'water',                 elementType: 'labels.text.fill',    stylers: [{ color: '#3a3a3a' }] },
+];
 
 const BASE_STYLES = [
   { featureType: 'poi.park', stylers: [{ visibility: 'off' }] },
@@ -185,7 +203,14 @@ function makeClusterIcon(color, count, diameter) {
 
 // ─── Main component ────────────────────────────────────────────────────────────
 
+function getStyles(dark, showPoi) {
+  const base = dark ? [...DARK_BASE, ...BASE_STYLES] : BASE_STYLES;
+  if (!showPoi) return [...(dark ? DARK_BASE : []), ...STYLES_NO_POI];
+  return base;
+}
+
 export default function GoogleMapComp({ markers, selectedId, onMarkerClick, onMapClick, cluster, showDistricts, crosshair, onPoiClick, showPoiMarkers = true, onMapReady }) {
+  const { dark } = useTheme();
   const { isLoaded, loadError } = useJsApiLoader({
     id: 'crm-warsaw-map',
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
@@ -251,11 +276,11 @@ export default function GoogleMapComp({ markers, selectedId, onMarkerClick, onMa
     mapRef.current.setOptions({ draggableCursor: crosshair ? 'crosshair' : '' });
   }, [crosshair]);
 
-  // POI markers visibility
+  // Map styles — react to both dark mode and POI toggle
   useEffect(() => {
     if (!mapRef.current) return;
-    mapRef.current.setOptions({ styles: showPoiMarkers ? BASE_STYLES : STYLES_NO_POI });
-  }, [showPoiMarkers]);
+    mapRef.current.setOptions({ styles: getStyles(dark, showPoiMarkers) });
+  }, [dark, showPoiMarkers]);
 
   // Districts data layer
   useEffect(() => {
