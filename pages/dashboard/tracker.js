@@ -166,10 +166,10 @@ export default function TrackerPage() {
       </PageHeader>
 
       {/* Main content: kanban + notes */}
-      <div className="flex flex-col lg:flex-row gap-5 items-start">
+      <div className="flex flex-col lg:flex-row gap-5 lg:items-start">
 
         {/* Kanban side */}
-        <div className="flex-1 min-w-0">
+        <div className="w-full min-w-0 lg:flex-1">
           {/* Stats row — compact strip on mobile, cards on desktop */}
           <div className="mb-4 sm:mb-5">
             {/* Mobile: inline dot + label + count */}
