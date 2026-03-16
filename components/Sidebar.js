@@ -90,10 +90,10 @@ export default function Sidebar() {
   const userInitial = userEmail.charAt(0).toUpperCase() || 'U';
 
   return (
-    <aside className="w-[220px] h-screen sticky top-0 bg-white dark:bg-[#111827] border-r border-gray-200 dark:border-[#1f2d42] flex flex-col select-none shrink-0">
+    <aside className="w-[220px] h-screen sticky top-0 bg-white dark:bg-[#191919] border-r border-gray-200 dark:border-[#2a2a2a] flex flex-col select-none shrink-0">
 
       {/* Company header */}
-      <div className="px-4 py-3.5 border-b border-gray-100 dark:border-[#1f2d42] flex items-center gap-2">
+      <div className="px-4 py-3.5 border-b border-gray-100 dark:border-[#2a2a2a] flex items-center gap-2">
         <img src="/logo-black.png" alt="Icon" className="h-7 w-auto object-contain shrink-0 dark:invert" />
         <img src="/wordmark-black.svg" alt="CRT Agency" className="h-6 w-auto object-contain dark:invert" />
       </div>
@@ -114,8 +114,8 @@ export default function Sidebar() {
                     href={item.href}
                     className={`flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] font-medium transition-all ${
                       active
-                        ? 'bg-gray-100 dark:bg-[#1f2d42] text-gray-900 dark:text-white'
-                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#1a2540] hover:text-gray-900 dark:hover:text-white'
+                        ? 'bg-gray-100 dark:bg-[#2a2a2a] text-gray-900 dark:text-[#f0f0f0]'
+                        : 'text-gray-600 dark:text-[#737373] hover:bg-gray-50 dark:hover:bg-[#252525] hover:text-gray-900 dark:hover:text-[#f0f0f0]'
                     }`}
                   >
                     <span className={`w-4 h-4 flex items-center justify-center shrink-0 ${active ? 'text-gray-700' : 'text-gray-400'}`}>
@@ -139,7 +139,7 @@ export default function Sidebar() {
       <div className="px-3 pb-1">
         <button
           onClick={toggle}
-          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#1f2d42] transition-colors group"
+          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-gray-500 dark:text-[#737373] hover:bg-gray-50 dark:hover:bg-[#252525] transition-colors"
           title={dark ? 'Switch to light mode' : 'Switch to dark mode'}
         >
           {/* Icon */}
@@ -163,7 +163,7 @@ export default function Sidebar() {
       </div>
 
       {/* User footer */}
-      <div className="px-3 py-3 border-t border-gray-100 dark:border-[#1f2d42]">
+      <div className="px-3 py-3 border-t border-gray-100 dark:border-[#2a2a2a]">
         <div className="flex items-center gap-2.5 px-1">
           <div className="w-7 h-7 rounded-full overflow-hidden shrink-0 flex items-center justify-center bg-gray-100">
             <img src="/logo-black.png" alt="Logo" className="w-5 h-5 object-contain dark:invert" />

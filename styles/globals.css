@@ -10,71 +10,113 @@ html, body {
   box-sizing: border-box;
 }
 
-/* ── Smooth theme transition ─────────────────────────────── */
+/* ── Smooth theme transition ─────────────────────────────────────── */
 *, *::before, *::after {
-  transition: background-color 220ms ease, border-color 220ms ease,
-              color 180ms ease, box-shadow 220ms ease, opacity 180ms ease;
+  transition: background-color 200ms ease, border-color 200ms ease,
+              color 160ms ease, box-shadow 200ms ease, fill 160ms ease;
 }
+/* Don't animate SVG strokes or anything that shouldn't move */
+svg *, img { transition: none; }
 
-/* ── Dark mode overrides ─────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────
+   DARK MODE — Graphite palette
+   bg1  #111111  page background
+   bg2  #1a1a1a  sidebar, panels
+   bg3  #222222  cards, table rows
+   bg4  #2a2a2a  hover, elevated
+   bd1  #2e2e2e  subtle border
+   bd2  #383838  border
+   t1   #f0f0f0  primary text
+   t2   #9a9a9a  secondary text
+   t3   #5e5e5e  muted text
+───────────────────────────────────────────────────────────────── */
 
-/* White surfaces → dark cards */
-html.dark .bg-white  { background-color: #161d2e !important; }
-html.dark .bg-gray-50 { background-color: #111827 !important; }
-html.dark .bg-\[\#f8f9fb\] { background-color: #0e1320 !important; }
+/* Page background */
+html.dark .bg-\[\#f8f9fb\] { background-color: #111111 !important; }
+html.dark .dark\:bg-\[#111111\] { background-color: #111111 !important; }
+
+/* White surfaces → graphite cards */
+html.dark .bg-white { background-color: #1e1e1e !important; }
+
+/* Gray surfaces */
+html.dark .bg-gray-50  { background-color: #181818 !important; }
+html.dark .bg-gray-100 { background-color: #2a2a2a !important; }
+html.dark .bg-gray-200 { background-color: #333333 !important; }
 
 /* Borders */
-html.dark .border-gray-100 { border-color: #1f2d42 !important; }
-html.dark .border-gray-200 { border-color: #263347 !important; }
-html.dark .border-gray-300 { border-color: #334155 !important; }
+html.dark .border-gray-100 { border-color: #2a2a2a !important; }
+html.dark .border-gray-200 { border-color: #2e2e2e !important; }
+html.dark .border-gray-300 { border-color: #404040 !important; }
 
 /* Text */
-html.dark .text-gray-900 { color: #f1f5f9 !important; }
-html.dark .text-gray-800 { color: #e2e8f0 !important; }
-html.dark .text-gray-700 { color: #cbd5e1 !important; }
-html.dark .text-gray-600 { color: #94a3b8 !important; }
-html.dark .text-gray-500 { color: #64748b !important; }
-html.dark .text-gray-400 { color: #475569 !important; }
-html.dark .text-gray-300 { color: #334155 !important; }
+html.dark .text-gray-900 { color: #f0f0f0 !important; }
+html.dark .text-gray-800 { color: #e0e0e0 !important; }
+html.dark .text-gray-700 { color: #c8c8c8 !important; }
+html.dark .text-gray-600 { color: #9a9a9a !important; }
+html.dark .text-gray-500 { color: #737373 !important; }
+html.dark .text-gray-400 { color: #5e5e5e !important; }
+html.dark .text-gray-300 { color: #404040 !important; }
 
 /* Shadows */
-html.dark .shadow-sm  { box-shadow: 0 1px 4px rgba(0,0,0,0.5) !important; }
-html.dark .shadow-md  { box-shadow: 0 4px 12px rgba(0,0,0,0.5) !important; }
-html.dark .shadow-xl  { box-shadow: 0 20px 60px rgba(0,0,0,0.7) !important; }
-html.dark .shadow-2xl { box-shadow: 0 25px 80px rgba(0,0,0,0.8) !important; }
+html.dark .shadow-sm  { box-shadow: 0 1px 3px rgba(0,0,0,0.6) !important; }
+html.dark .shadow-md  { box-shadow: 0 4px 12px rgba(0,0,0,0.6) !important; }
+html.dark .shadow-xl  { box-shadow: 0 20px 50px rgba(0,0,0,0.7) !important; }
+html.dark .shadow-2xl { box-shadow: 0 25px 70px rgba(0,0,0,0.8) !important; }
 
-/* Inputs & selects */
+/* Hover states */
+html.dark .hover\:bg-gray-50:hover  { background-color: #252525 !important; }
+html.dark .hover\:bg-gray-100:hover { background-color: #2a2a2a !important; }
+html.dark .hover\:bg-gray-700:hover { background-color: #3a3a3a !important; }
+html.dark .hover\:border-gray-300:hover { border-color: #444444 !important; }
+
+/* ── Inputs, textareas, selects ──────────────────────────── */
 html.dark input,
 html.dark textarea,
 html.dark select {
-  background-color: #1a2540 !important;
-  border-color: #263347 !important;
-  color: #e2e8f0 !important;
+  background-color: #252525 !important;
+  border-color: #383838 !important;
+  color: #e0e0e0 !important;
+  color-scheme: dark;
 }
 html.dark input::placeholder,
-html.dark textarea::placeholder { color: #3d5270 !important; }
-html.dark input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.6); }
+html.dark textarea::placeholder { color: #4a4a4a !important; }
+html.dark input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.7); }
+html.dark select option { background-color: #222222; color: #e0e0e0; }
 
-/* Table rows hover */
-html.dark tbody tr:hover td { background-color: #1a2540 !important; }
+/* ── Table ───────────────────────────────────────────────── */
+html.dark thead th { color: #737373 !important; }
+html.dark tbody tr { border-color: #2a2a2a !important; }
+html.dark tbody tr:hover td { background-color: #252525 !important; }
+html.dark td { color: #c8c8c8 !important; border-color: #2a2a2a !important; }
 
-/* Hover bg utilities */
-html.dark .hover\:bg-gray-50:hover  { background-color: #1a2540 !important; }
-html.dark .hover\:bg-gray-100:hover { background-color: #1f2e45 !important; }
+/* ── Badges / pills ──────────────────────────────────────── */
+html.dark .bg-amber-100  { background-color: #3a2e1a !important; }
+html.dark .text-amber-700 { color: #e8a030 !important; }
+html.dark .bg-emerald-100 { background-color: #162820 !important; }
+html.dark .text-emerald-700 { color: #34c97a !important; }
+html.dark .bg-red-100    { background-color: #2f1515 !important; }
+html.dark .text-red-600  { color: #f06060 !important; }
+html.dark .bg-blue-100   { background-color: #141e30 !important; }
+html.dark .text-blue-600 { color: #5a9cf5 !important; }
 
-/* Active/selected nav + bg-gray-100 used in badges, selected states */
-html.dark .bg-gray-100 { background-color: #1f2d42 !important; }
-html.dark .bg-gray-200 { background-color: #263347 !important; }
+/* ── Primary action buttons (gray-900 bg) ─────────────────  */
+/* Keep them dark but slightly lifted */
+html.dark .bg-gray-900  { background-color: #2a2a2a !important; }
+html.dark .hover\:bg-gray-800:hover { background-color: #333333 !important; }
 
-/* Kanban drop zone */
-html.dark .bg-gray-50\/60 { background-color: rgba(17,24,39,0.6) !important; }
+/* ── Modals / overlays ───────────────────────────────────── */
+html.dark .backdrop-blur-sm { backdrop-filter: blur(6px); }
 
-/* Scrollbar */
-html.dark ::-webkit-scrollbar { width: 6px; }
-html.dark ::-webkit-scrollbar-track { background: #0e1320; }
-html.dark ::-webkit-scrollbar-thumb { background: #263347; border-radius: 3px; }
+/* ── Kanban ──────────────────────────────────────────────── */
+html.dark .bg-gray-50\/60 { background-color: rgba(26,26,26,0.8) !important; }
 
-/* District tooltip on the map */
+/* ── Scrollbar ───────────────────────────────────────────── */
+html.dark ::-webkit-scrollbar { width: 5px; height: 5px; }
+html.dark ::-webkit-scrollbar-track { background: #111111; }
+html.dark ::-webkit-scrollbar-thumb { background: #333333; border-radius: 3px; }
+html.dark ::-webkit-scrollbar-thumb:hover { background: #444444; }
+
+/* ── District tooltip (Leaflet) ──────────────────────────── */
 .district-tooltip {
   background: white;
   border: 1px solid #e5e7eb;
@@ -89,12 +131,15 @@ html.dark ::-webkit-scrollbar-thumb { background: #263347; border-radius: 3px; }
 .district-tooltip::before { display: none; }
 
 html.dark .district-tooltip {
-  background: #161d2e !important;
-  border-color: #263347 !important;
-  color: #cbd5e1 !important;
+  background: #1e1e1e !important;
+  border-color: #2e2e2e !important;
+  color: #c8c8c8 !important;
 }
 
-/* Override Leaflet cursor in picking/relocating modes */
+/* ── Leaflet map dark ────────────────────────────────────── */
+html.dark .leaflet-container { filter: brightness(0.85) contrast(1.05); }
+
+/* ── Override Leaflet cursor ─────────────────────────────── */
 .map-crosshair,
 .map-crosshair .leaflet-container,
 .map-crosshair .leaflet-grab,
