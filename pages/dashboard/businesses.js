@@ -342,7 +342,7 @@ export default function BusinessesPage() {
 
       {/* View tabs + filters */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
-        <div className="flex items-center gap-0.5 bg-gray-100 rounded-lg p-1 self-start">
+        <div className="hidden sm:flex items-center gap-0.5 bg-gray-100 rounded-lg p-1 self-start">
           {VIEW_TABS.map((tab) => (
             <button key={tab.key} onClick={() => setActiveView(tab.key)}
               className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[12px] font-medium transition-all ${activeView === tab.key ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>
@@ -389,13 +389,16 @@ export default function BusinessesPage() {
         </div>
       </div>
 
-      {/* Board view */}
+      {/* Board view — desktop only */}
       {activeView === 'board' && (
-        <BoardView businesses={filtered} onEdit={handleEdit} onDelete={handleDelete} onStatusChange={changeStatus} onProfile={setProfileBiz} />
+        <div className="hidden sm:block">
+          <BoardView businesses={filtered} onEdit={handleEdit} onDelete={handleDelete} onStatusChange={changeStatus} onProfile={setProfileBiz} />
+        </div>
       )}
 
-      {/* Table view */}
-      {activeView === 'table' && (
+      {/* Table view — always on mobile; on desktop only when activeView === 'table' */}
+      {(activeView === 'table' || activeView === 'board') && (
+        <div className={activeView === 'board' ? 'sm:hidden' : undefined}>
         <>
         {/* Mobile cards */}
         <div className="md:hidden space-y-3">
@@ -560,6 +563,7 @@ export default function BusinessesPage() {
           </div>
         </div>
         </>
+        </div>
       )}
     </Layout>
   );
