@@ -339,8 +339,8 @@ export default function BusinessesPage() {
       )}
 
       {/* View tabs + filters */}
-      <div className="flex items-center justify-between mb-4 gap-3">
-        <div className="flex items-center gap-0.5 bg-gray-100 rounded-lg p-1">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
+        <div className="flex items-center gap-0.5 bg-gray-100 rounded-lg p-1 self-start">
           {VIEW_TABS.map((tab) => (
             <button key={tab.key} onClick={() => setActiveView(tab.key)}
               className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[12px] font-medium transition-all ${activeView === tab.key ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>
@@ -349,12 +349,12 @@ export default function BusinessesPage() {
           ))}
         </div>
 
-        <div className="flex items-center gap-2 flex-1 justify-end">
-          <div className="relative">
+        <div className="flex flex-wrap items-center gap-2 sm:flex-1 sm:justify-end">
+          <div className="relative flex-1 sm:flex-none">
             <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
             <input type="text" placeholder="Search..." value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-              className="w-48 pl-8 pr-3 py-[7px] text-[13px] text-gray-700 bg-white border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent placeholder-gray-400 transition hover:border-gray-300" />
+              className="w-full sm:w-48 pl-8 pr-3 py-[7px] text-[13px] text-gray-700 bg-white border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent placeholder-gray-400 transition hover:border-gray-300" />
           </div>
           <div className="w-px h-5 bg-gray-200" />
           <StatusSelect
@@ -387,7 +387,67 @@ export default function BusinessesPage() {
 
       {/* Table view */}
       {activeView === 'table' && (
-        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+        <>
+        {/* Mobile cards */}
+        <div className="md:hidden space-y-3">
+          {pageRows.map((biz) => {
+            const cfg = STATUS_CONFIG[biz.status];
+            return (
+              <div key={biz.id} className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
+                <div className="flex items-start justify-between gap-2 mb-1">
+                  <button onClick={() => setProfileBiz(biz)} className="text-[14px] font-semibold text-gray-900 text-left leading-snug flex-1">
+                    {biz.name}
+                  </button>
+                  <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold shrink-0 ${cfg.badge}`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
+                    {cfg.label}
+                  </span>
+                </div>
+                <p className="text-[12px] text-gray-400 mb-3">{biz.type} {biz.district && biz.district !== '—' ? `· ${biz.district}` : ''}</p>
+                <div className="flex items-center gap-3 mb-3 flex-wrap">
+                  {biz.phone && biz.phone !== '—' && (
+                    <a href={`tel:${biz.phone}`} className="text-[13px] text-gray-600 font-medium">{biz.phone}</a>
+                  )}
+                  {biz.website && biz.website !== '—' && (
+                    <a href={biz.website.startsWith('http') ? biz.website : `https://${biz.website}`} target="_blank" rel="noopener noreferrer"
+                      className="text-[13px] text-blue-500 truncate max-w-[180px]">
+                      {biz.website.replace(/^https?:\/\/(www\.)?/, '')}
+                    </a>
+                  )}
+                </div>
+                <div className="flex gap-2 pt-3 border-t border-gray-100">
+                  <button onClick={() => setProfileBiz(biz)}
+                    className="flex-1 min-h-[40px] rounded-lg text-[12px] font-medium text-gray-600 border border-gray-200 hover:bg-gray-50 transition-colors">
+                    View
+                  </button>
+                  <button onClick={() => handleEdit(biz)}
+                    className="flex-1 min-h-[40px] rounded-lg text-[12px] font-medium text-gray-600 border border-gray-200 hover:bg-gray-50 transition-colors">
+                    Edit
+                  </button>
+                  <button onClick={() => handleDelete(biz)}
+                    className="min-h-[40px] px-3 rounded-lg text-[12px] font-medium text-red-500 border border-red-100 bg-red-50 hover:bg-red-100 transition-colors">
+                    Delete
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+          {/* Mobile pagination */}
+          <div className="flex items-center justify-between pt-2 pb-4">
+            <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1}
+              className="w-10 h-10 flex items-center justify-center rounded-xl border border-gray-200 text-gray-400 disabled:opacity-30">
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
+            </button>
+            <span className="text-[13px] text-gray-500">{currentPage} / {totalPages}</span>
+            <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}
+              className="w-10 h-10 flex items-center justify-center rounded-xl border border-gray-200 text-gray-400 disabled:opacity-30">
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+            </button>
+          </div>
+        </div>
+
+        {/* Desktop table */}
+        <div className="hidden md:block bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
           <table className="w-full text-[13px]">
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50/60">
@@ -490,6 +550,7 @@ export default function BusinessesPage() {
             )}
           </div>
         </div>
+        </>
       )}
     </Layout>
   );

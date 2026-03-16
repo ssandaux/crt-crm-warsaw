@@ -166,12 +166,12 @@ export default function TrackerPage() {
       </PageHeader>
 
       {/* Main content: kanban + notes */}
-      <div className="flex gap-5 items-start">
+      <div className="flex flex-col lg:flex-row gap-5 items-start">
 
         {/* Kanban side */}
         <div className="flex-1 min-w-0">
           {/* Stats row */}
-          <div className="grid grid-cols-4 gap-3 mb-5">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mb-4 sm:mb-5">
             {COLUMNS.map((col) => (
               <div key={col.key} className="bg-white rounded-2xl border border-gray-200 px-4 py-3 shadow-sm">
                 <div className="flex items-center gap-1.5 mb-1.5">
@@ -187,7 +187,7 @@ export default function TrackerPage() {
           {loading ? (
             <div className="flex items-center justify-center py-20 text-gray-400 text-[13px]">Loading…</div>
           ) : (
-            <div className="grid grid-cols-4 gap-4">
+            <div className="flex gap-3 overflow-x-auto pb-3 snap-x snap-mandatory md:grid md:grid-cols-4 md:gap-4 md:overflow-visible md:pb-0" style={{ WebkitOverflowScrolling: 'touch' }}>
               {COLUMNS.map((col) => {
                 const colTasks = tasks.filter((t) => t.status === col.key);
                 const isOver = dragOver === col.key;
@@ -197,7 +197,7 @@ export default function TrackerPage() {
                     onDragOver={(e) => onDragOver(e, col.key)}
                     onDrop={(e) => onDrop(e, col.key)}
                     onDragLeave={() => setDragOver(null)}
-                    className={`flex flex-col min-h-[400px] rounded-2xl border transition-colors ${isOver ? 'border-gray-400 bg-gray-50' : 'border-gray-200 bg-gray-50/60'}`}
+                    className={`flex flex-col min-h-[400px] rounded-2xl border transition-colors shrink-0 w-[280px] snap-start md:w-auto ${isOver ? 'border-gray-400 bg-gray-50' : 'border-gray-200 bg-gray-50/60'}`}
                   >
                     {/* Column header */}
                     <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
@@ -263,7 +263,7 @@ export default function TrackerPage() {
         </div>
 
         {/* Notes panel */}
-        <div className="w-72 shrink-0 flex flex-col bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden" style={{ minHeight: 520 }}>
+        <div className="w-full lg:w-72 lg:shrink-0 flex flex-col bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden" style={{ minHeight: 320 }}>
           <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
             <div className="flex items-center gap-2">
               <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -280,7 +280,7 @@ export default function TrackerPage() {
             onChange={(e) => handleNotesChange(e.target.value)}
             placeholder="Write notes, ideas, reminders…"
             className="flex-1 w-full px-4 py-3 text-[13px] text-gray-700 placeholder:text-gray-300 leading-relaxed resize-none focus:outline-none"
-            style={{ minHeight: 460 }}
+            style={{ minHeight: 260 }}
           />
         </div>
 

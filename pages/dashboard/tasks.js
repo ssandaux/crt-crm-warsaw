@@ -339,7 +339,82 @@ export default function TasksPage() {
           <p className="text-[13px] text-gray-400">No untouched businesses left to review.</p>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+        <>
+        {/* ── Mobile card list ───────────────────────────────── */}
+        <div className="md:hidden space-y-3">
+          {pageRows.map((biz) => {
+            const url  = normalizeUrl(biz.website);
+            const anim = rowAnim[biz.id];
+            return (
+              <div
+                key={biz.id}
+                className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4"
+                style={{
+                  transition: 'opacity 260ms ease, transform 260ms ease, background-color 200ms ease',
+                  opacity: anim === 'hiding' ? 0 : 1,
+                  transform: anim === 'hiding' ? 'translateX(12px)' : 'translateX(0)',
+                  backgroundColor: anim === 'skipping' ? 'rgba(239,68,68,0.07)' : undefined,
+                  pointerEvents: anim ? 'none' : undefined,
+                }}
+              >
+                <div className="flex items-start justify-between gap-2 mb-2">
+                  <div className="min-w-0">
+                    <p className="text-[14px] font-semibold text-gray-900 leading-snug">{biz.name}</p>
+                    <p className="text-[12px] text-gray-400 mt-0.5">{biz.type || '—'}</p>
+                  </div>
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([biz.name, biz.address].filter(Boolean).join(' '))}`}
+                    target="_blank" rel="noopener noreferrer"
+                    className="w-9 h-9 flex items-center justify-center rounded-lg text-gray-400 hover:text-blue-500 hover:bg-blue-50 transition-colors shrink-0"
+                  >
+                    <IconGoogleMaps />
+                  </a>
+                </div>
+                {biz.address && biz.address !== '—' && (
+                  <p className="text-[12px] text-gray-400 mb-2 flex items-center gap-1.5">
+                    <IconMapPin /><span className="truncate">{biz.address}</span>
+                  </p>
+                )}
+                <div className="flex items-center gap-4 mb-3">
+                  {biz.phone && biz.phone !== '—' && (
+                    <a href={`tel:${biz.phone}`} className="flex items-center gap-1.5 text-[13px] text-gray-600 font-medium">
+                      <IconPhone />{biz.phone}
+                    </a>
+                  )}
+                  {url && (
+                    <a href={url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[13px] text-blue-500 truncate">
+                      <IconLink /><span className="truncate">{biz.website?.replace(/^https?:\/\/(www\.)?/, '')}</span>
+                    </a>
+                  )}
+                </div>
+                <div className="flex gap-2 pt-3 border-t border-gray-100">
+                  <ContactedButton animState={anim} onApprove={(s) => handleApprove(biz, s)} />
+                  <button
+                    onClick={() => handleSkip(biz)}
+                    className="flex-1 min-h-[44px] rounded-lg text-[13px] font-medium text-gray-400 border border-gray-200 hover:text-red-500 hover:border-red-200 hover:bg-red-50 transition-colors"
+                  >
+                    Skip
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+          {/* Mobile pagination */}
+          <div className="flex items-center justify-between pt-2 pb-4">
+            <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1}
+              className="w-10 h-10 flex items-center justify-center rounded-xl border border-gray-200 text-gray-400 disabled:opacity-30">
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
+            </button>
+            <span className="text-[13px] text-gray-500">{currentPage} / {totalPages}</span>
+            <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}
+              className="w-10 h-10 flex items-center justify-center rounded-xl border border-gray-200 text-gray-400 disabled:opacity-30">
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+            </button>
+          </div>
+        </div>
+
+        {/* ── Desktop table ────────────────────────────────────── */}
+        <div className="hidden md:block bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
           {/* Scrollable table wrapper */}
           <div className="overflow-x-auto">
             <table
@@ -521,6 +596,7 @@ export default function TasksPage() {
             )}
           </div>
         </div>
+        </>
       )}
 
       {historyOpen && (

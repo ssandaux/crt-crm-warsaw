@@ -76,7 +76,7 @@ const navGroups = [
   },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ mobileOpen = false, setMobileOpen = () => {} }) {
   const router = useRouter();
   const { user, signOut } = useAuth();
   const { dark, toggle } = useTheme();
@@ -90,7 +90,22 @@ export default function Sidebar() {
   const userInitial = userEmail.charAt(0).toUpperCase() || 'U';
 
   return (
-    <aside className="w-[220px] h-screen sticky top-0 bg-white dark:bg-[#191919] border-r border-gray-200 dark:border-[#2a2a2a] flex flex-col select-none shrink-0">
+    <>
+      {/* Mobile backdrop */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/40 sm:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+    <aside className={`
+      fixed inset-y-0 left-0 z-50 w-[220px] h-screen
+      bg-white dark:bg-[#191919] border-r border-gray-200 dark:border-[#2a2a2a]
+      flex flex-col select-none transition-transform duration-300 ease-in-out
+      ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}
+      sm:static sm:translate-x-0 sm:shrink-0 sm:z-auto
+    `}>
 
       {/* Company header */}
       <div className="px-4 py-3.5 border-b border-gray-100 dark:border-[#2a2a2a] flex items-center gap-2">
@@ -112,7 +127,8 @@ export default function Sidebar() {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[13px] font-medium transition-all ${
+                    onClick={() => setMobileOpen(false)}
+                    className={`flex items-center gap-2.5 px-2.5 py-2.5 sm:py-1.5 rounded-lg text-[13px] font-medium transition-all ${
                       active
                         ? 'bg-gray-100 dark:bg-[#2a2a2a] text-gray-900 dark:text-[#f0f0f0]'
                         : 'text-gray-600 dark:text-[#737373] hover:bg-gray-50 dark:hover:bg-[#252525] hover:text-gray-900 dark:hover:text-[#f0f0f0]'
@@ -181,5 +197,6 @@ export default function Sidebar() {
       </div>
 
     </aside>
+    </>
   );
 }
