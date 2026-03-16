@@ -200,78 +200,132 @@ export default function TrackerPage() {
           {loading ? (
             <div className="flex items-center justify-center py-20 text-gray-400 text-[13px]">Loading…</div>
           ) : (
-            <div className="flex gap-3 overflow-x-auto pb-3 snap-x snap-mandatory md:grid md:grid-cols-4 md:gap-4 md:overflow-visible md:pb-0" style={{ WebkitOverflowScrolling: 'touch' }}>
-              {COLUMNS.map((col) => {
-                const colTasks = tasks.filter((t) => t.status === col.key);
-                const isOver = dragOver === col.key;
-                return (
-                  <div
-                    key={col.key}
-                    onDragOver={(e) => onDragOver(e, col.key)}
-                    onDrop={(e) => onDrop(e, col.key)}
-                    onDragLeave={() => setDragOver(null)}
-                    className={`flex flex-col min-h-[200px] sm:min-h-[400px] rounded-2xl border transition-colors shrink-0 w-[260px] snap-start md:w-auto ${isOver ? 'border-gray-400 bg-gray-50' : 'border-gray-200 bg-gray-50/60'}`}
-                  >
-                    {/* Column header */}
-                    <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
-                      <div className="flex items-center gap-2">
-                        <span className={`w-2 h-2 rounded-full ${col.color}`} />
-                        <span className="text-[12px] font-semibold text-gray-700">{col.label}</span>
-                        <span className="text-[11px] text-gray-400 font-medium">{counts[col.key]}</span>
-                      </div>
-                      <button
-                        onClick={() => openAdd(col.key)}
-                        className="w-6 h-6 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-200 transition-colors"
-                        title="Add task"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                        </svg>
-                      </button>
-                    </div>
-
-                    {/* Cards */}
-                    <div className="flex flex-col gap-2 p-3 flex-1">
-                      {colTasks.length === 0 && (
-                        <div className="flex items-center justify-center flex-1 text-[12px] text-gray-300 select-none">
-                          Drop here
+            <>
+              {/* ── Mobile: vertical stacked sections ── */}
+              <div className="flex flex-col gap-3 md:hidden">
+                {COLUMNS.map((col) => {
+                  const colTasks = tasks.filter((t) => t.status === col.key);
+                  return (
+                    <div key={col.key} className="rounded-2xl border border-gray-200 bg-gray-50/60 overflow-hidden">
+                      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-white">
+                        <div className="flex items-center gap-2">
+                          <span className={`w-2 h-2 rounded-full ${col.color}`} />
+                          <span className="text-[13px] font-semibold text-gray-700">{col.label}</span>
+                          <span className="text-[11px] text-gray-400 font-medium">{colTasks.length}</span>
                         </div>
-                      )}
-                      {colTasks.map((task) => {
-                        const pr = priorityMeta(task.priority);
-                        const dl = formatDeadline(task.deadline);
-                        const isDragging = dragId === task.id;
-                        return (
-                          <div
-                            key={task.id}
-                            draggable
-                            onDragStart={(e) => onDragStart(e, task.id)}
-                            onDragEnd={onDragEnd}
-                            onClick={() => openEdit(task)}
-                            className={`bg-white rounded-xl border border-gray-200 px-3.5 py-3 shadow-sm cursor-grab active:cursor-grabbing hover:shadow-md hover:border-gray-300 transition-all select-none ${isDragging ? 'opacity-40' : ''}`}
-                          >
-                            <div className="flex items-center justify-between mb-2">
-                              <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold ${pr.bg} ${pr.text}`}>
-                                {pr.label}
-                              </span>
-                              {dl && (
-                                <span className={`text-[10px] font-medium ${dl.overdue ? 'text-red-500' : dl.soon ? 'text-amber-500' : 'text-gray-400'}`}>
-                                  {dl.overdue ? '⚠ ' : ''}{dl.label}
+                        <button
+                          onClick={() => openAdd(col.key)}
+                          className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                          </svg>
+                        </button>
+                      </div>
+                      <div className="flex flex-col gap-2 p-3">
+                        {colTasks.length === 0 && (
+                          <p className="text-center text-[12px] text-gray-300 py-3">No tasks</p>
+                        )}
+                        {colTasks.map((task) => {
+                          const pr = priorityMeta(task.priority);
+                          const dl = formatDeadline(task.deadline);
+                          return (
+                            <div
+                              key={task.id}
+                              onClick={() => openEdit(task)}
+                              className="bg-white rounded-xl border border-gray-200 px-3.5 py-3 shadow-sm active:scale-[0.98] transition-transform"
+                            >
+                              <div className="flex items-center justify-between mb-2">
+                                <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold ${pr.bg} ${pr.text}`}>
+                                  {pr.label}
                                 </span>
+                                {dl && (
+                                  <span className={`text-[10px] font-medium ${dl.overdue ? 'text-red-500' : dl.soon ? 'text-amber-500' : 'text-gray-400'}`}>
+                                    {dl.overdue ? '⚠ ' : ''}{dl.label}
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-[13px] font-semibold text-gray-800 leading-snug mb-1">{task.title}</p>
+                              {task.description && (
+                                <p className="text-[11px] text-gray-400 leading-snug line-clamp-2">{task.description}</p>
                               )}
                             </div>
-                            <p className="text-[13px] font-semibold text-gray-800 leading-snug mb-1">{task.title}</p>
-                            {task.description && (
-                              <p className="text-[11px] text-gray-400 leading-snug line-clamp-2">{task.description}</p>
-                            )}
-                          </div>
-                        );
-                      })}
+                          );
+                        })}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+
+              {/* ── Desktop: horizontal kanban grid ── */}
+              <div className="hidden md:grid grid-cols-4 gap-4">
+                {COLUMNS.map((col) => {
+                  const colTasks = tasks.filter((t) => t.status === col.key);
+                  const isOver = dragOver === col.key;
+                  return (
+                    <div
+                      key={col.key}
+                      onDragOver={(e) => onDragOver(e, col.key)}
+                      onDrop={(e) => onDrop(e, col.key)}
+                      onDragLeave={() => setDragOver(null)}
+                      className={`flex flex-col min-h-[400px] rounded-2xl border transition-colors ${isOver ? 'border-gray-400 bg-gray-50' : 'border-gray-200 bg-gray-50/60'}`}
+                    >
+                      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+                        <div className="flex items-center gap-2">
+                          <span className={`w-2 h-2 rounded-full ${col.color}`} />
+                          <span className="text-[12px] font-semibold text-gray-700">{col.label}</span>
+                          <span className="text-[11px] text-gray-400 font-medium">{counts[col.key]}</span>
+                        </div>
+                        <button
+                          onClick={() => openAdd(col.key)}
+                          className="w-6 h-6 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-200 transition-colors"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                          </svg>
+                        </button>
+                      </div>
+                      <div className="flex flex-col gap-2 p-3 flex-1">
+                        {colTasks.length === 0 && (
+                          <div className="flex items-center justify-center flex-1 text-[12px] text-gray-300 select-none">Drop here</div>
+                        )}
+                        {colTasks.map((task) => {
+                          const pr = priorityMeta(task.priority);
+                          const dl = formatDeadline(task.deadline);
+                          const isDragging = dragId === task.id;
+                          return (
+                            <div
+                              key={task.id}
+                              draggable
+                              onDragStart={(e) => onDragStart(e, task.id)}
+                              onDragEnd={onDragEnd}
+                              onClick={() => openEdit(task)}
+                              className={`bg-white rounded-xl border border-gray-200 px-3.5 py-3 shadow-sm cursor-grab active:cursor-grabbing hover:shadow-md hover:border-gray-300 transition-all select-none ${isDragging ? 'opacity-40' : ''}`}
+                            >
+                              <div className="flex items-center justify-between mb-2">
+                                <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold ${pr.bg} ${pr.text}`}>
+                                  {pr.label}
+                                </span>
+                                {dl && (
+                                  <span className={`text-[10px] font-medium ${dl.overdue ? 'text-red-500' : dl.soon ? 'text-amber-500' : 'text-gray-400'}`}>
+                                    {dl.overdue ? '⚠ ' : ''}{dl.label}
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-[13px] font-semibold text-gray-800 leading-snug mb-1">{task.title}</p>
+                              {task.description && (
+                                <p className="text-[11px] text-gray-400 leading-snug line-clamp-2">{task.description}</p>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </>
           )}
         </div>
 
