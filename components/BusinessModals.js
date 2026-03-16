@@ -119,16 +119,17 @@ export function EditModal({ biz, onClose, onSave }) {
               <input type="email" value={form.email} onChange={(e) => set('email', e.target.value)} className="w-full px-3 py-2 text-[13px] text-gray-800 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-gray-300 transition" />
             </div>
           </div>
-          {/* Row 6: Next Action + Reminder Date — stacked to avoid date overflow */}
-          <div className="grid grid-cols-2 gap-2">
-            <div>
+          {/* Row 6: Next Action + Reminder Date */}
+          <div className="grid grid-cols-2 gap-2 overflow-hidden">
+            <div className="min-w-0 overflow-hidden">
               <label className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide block mb-0.5">Next Action</label>
               <input type="text" placeholder="Call Friday…" value={form.nextAction} onChange={(e) => set('nextAction', e.target.value)} className="w-full px-3 py-2 text-[13px] text-gray-800 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-gray-300 transition placeholder-gray-400" />
             </div>
-            <div className="min-w-0">
+            <div className="min-w-0 overflow-hidden">
               <label className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide block mb-0.5">Reminder</label>
               <input type="date" value={form.followUpDate} onChange={(e) => set('followUpDate', e.target.value)}
-                className="w-full min-w-0 px-2 py-2 text-[12px] text-gray-800 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-gray-300 transition" />
+                style={{ WebkitAppearance: 'none', appearance: 'none' }}
+                className="w-full max-w-full px-3 py-2 text-[12px] text-gray-800 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-gray-300 transition" />
             </div>
           </div>
           {/* Row 7: Note */}
