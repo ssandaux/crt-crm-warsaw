@@ -11,9 +11,10 @@ const COLUMNS = [
 ];
 
 const PRIORITIES = [
-  { value: 'low',    label: 'Low',    bg: 'bg-gray-100',   text: 'text-gray-500'  },
-  { value: 'medium', label: 'Medium', bg: 'bg-amber-100',  text: 'text-amber-700' },
-  { value: 'high',   label: 'High',   bg: 'bg-red-100',    text: 'text-red-600'   },
+  { value: 'low',     label: 'Low',     bg: 'bg-gray-100',   text: 'text-gray-500'   },
+  { value: 'medium',  label: 'Medium',  bg: 'bg-amber-100',  text: 'text-amber-700'  },
+  { value: 'high',    label: 'High',    bg: 'bg-red-100',    text: 'text-red-600'    },
+  { value: 'special', label: 'Special', bg: 'bg-purple-100', text: 'text-purple-700' },
 ];
 
 function priorityMeta(val) {
