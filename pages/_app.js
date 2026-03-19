@@ -25,7 +25,7 @@ function RouteGuard({ children }) {
 
     // Already logged in → skip login page
     if (user && isPublic) {
-      router.replace('/dashboard/map');
+      router.replace('/dashboard/businesses');
     }
   }, [user, loading, router.pathname]); // eslint-disable-line react-hooks/exhaustive-deps
 

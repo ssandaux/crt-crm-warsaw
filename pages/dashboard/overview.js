@@ -76,19 +76,19 @@ export default function OverviewPage() {
       {/* Import confirm modal */}
       {importConfirm && (() => {
         const info = getImportWaveInfo();
-        const waveLabels = ['центр Варшавы', 'средний пояс', 'внешний пояс'];
-        const area = waveLabels[info.wave - 1] ?? `пояс ${info.wave}`;
+        const waveLabels = ['city centre', 'mid ring', 'outer ring'];
+        const area = waveLabels[info.wave - 1] ?? `zone ${info.wave}`;
         return (
           <div className="fixed inset-0 z-[3000] flex items-center justify-center bg-black/40 backdrop-blur-sm">
             <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 w-full max-w-sm mx-4 p-6">
               <div className="flex items-center gap-2 mb-3">
                 <p className="text-[15px] font-bold text-gray-900">Import from Google</p>
                 <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">
-                  Волна {info.wave} / {info.totalWaves}
+                  Wave {info.wave} / {info.totalWaves}
                 </span>
               </div>
               <p className="text-[13px] text-gray-500 mb-6">
-                Будет просканирован <span className="font-medium text-gray-700">{area}</span> — {info.cellCount} зон (~3–4 мин). Новые бизнесы добавятся как <span className="font-medium text-gray-700">untouched</span>. Дубликаты пропускаются.
+                Will scan <span className="font-medium text-gray-700">{area}</span> — {info.cellCount} zones (~3–4 min). New businesses will be added as <span className="font-medium text-gray-700">untouched</span>. Duplicates are skipped.
               </p>
               <div className="flex gap-3">
                 <button
