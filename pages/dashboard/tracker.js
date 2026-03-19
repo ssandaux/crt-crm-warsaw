@@ -275,7 +275,7 @@ export default function TrackerPage() {
                           </svg>
                         </button>
                       </div>
-                      <div className="flex flex-col gap-2 p-3 flex-1">
+                      <div className="flex flex-col gap-2 p-3 flex-1 overflow-y-auto">
                         {colTasks.length === 0 && (
                           <div className="flex items-center justify-center flex-1 text-[12px] text-gray-300 select-none">Drop here</div>
                         )}
