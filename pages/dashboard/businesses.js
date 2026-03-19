@@ -12,7 +12,6 @@ const COLUMNS = [
   { key: 'name',       label: 'Business' },
   { key: 'status',     label: 'Status' },
   { key: 'type',       label: 'Type' },
-  { key: 'district',   label: 'District' },
   { key: 'contact',    label: 'Email' },
   { key: 'lastAction',  label: 'Last action' },
   { key: 'followUpDate', label: 'Reminder' },
@@ -491,7 +490,6 @@ export default function BusinessesPage() {
                   <td className="px-4 py-3"><button onClick={() => setProfileBiz(biz)} className="font-semibold text-gray-900 hover:text-gray-600 text-left transition-colors">{biz.name}</button></td>
                   <td className="px-4 py-3"><InlineStatusSelect biz={biz} onChange={changeStatus} /></td>
                   <td className="px-4 py-3 text-gray-500">{biz.type}</td>
-                  <td className="px-4 py-3 text-gray-500">{biz.district}</td>
                   <td className="px-4 py-3 text-gray-400 text-[12px]">{biz.email}</td>
                   <td className="px-4 py-3 text-gray-400 text-[12px] whitespace-nowrap">
                     {new Date(biz.lastAction).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
