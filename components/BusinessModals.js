@@ -41,7 +41,6 @@ export function EditModal({ biz, onClose, onSave }) {
     e.preventDefault();
     const errs = {};
     if (!form.name.trim()) errs.name = true;
-    if (!form.district) errs.district = true;
     if (Object.keys(errs).length) { setErrors(errs); return; }
     const coords = geocodedCoords.current
       ? { lat: geocodedCoords.current.lat, lng: geocodedCoords.current.lng }
@@ -76,7 +75,7 @@ export function EditModal({ biz, onClose, onSave }) {
             </div>
             <div>
               <label className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide block mb-0.5">District *</label>
-              <select value={form.district} onChange={(e) => set('district', e.target.value)} className={`w-full px-3 py-2 text-[12px] text-gray-700 bg-gray-50 border rounded-lg outline-none focus:ring-2 focus:ring-gray-300 appearance-none ${errors.district ? 'border-red-300' : 'border-gray-200'}`}>
+              <select value={form.district} onChange={(e) => set('district', e.target.value)} className="w-full px-3 py-2 text-[12px] text-gray-700 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-gray-300 appearance-none">
                 <option value="">Select...</option>
                 {districts.map((d) => <option key={d} value={d}>{d}</option>)}
               </select>
