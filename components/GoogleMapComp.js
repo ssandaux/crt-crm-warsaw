@@ -336,8 +336,10 @@ export default function GoogleMapComp({ markers, selectedId, onMarkerClick, onMa
             icon={makeCircleIcon(color, radius, isSelected ? 3 : 2.5)}
             zIndex={isSelected ? 100 : isHovered ? 50 : 1}
             onClick={() => { markerJustClicked.current = true; onMarkerClick(m.id); }}
-            onMouseOver={() => setHoveredId(m.id)}
-            onMouseOut={() => setHoveredId(null)}
+            onLoad={(marker) => {
+              marker.addListener('mouseover', () => setHoveredId(m.id));
+              marker.addListener('mouseout', () => setHoveredId(null));
+            }}
           />
         );
       });
@@ -355,10 +357,12 @@ export default function GoogleMapComp({ markers, selectedId, onMarkerClick, onMa
             key={`s-${m.id}`}
             position={{ lat: m.lat, lng: m.lng }}
             icon={makeCircleIcon(color, radius, isSelected ? 3 : 2.5)}
-            zIndex={isSelected ? 100 : 1}
+            zIndex={isSelected ? 100 : isHovered ? 50 : 1}
             onClick={() => { markerJustClicked.current = true; onMarkerClick(m.id); }}
-            onMouseOver={() => setHoveredId(m.id)}
-            onMouseOut={() => setHoveredId(null)}
+            onLoad={(marker) => {
+              marker.addListener('mouseover', () => setHoveredId(m.id));
+              marker.addListener('mouseout', () => setHoveredId(null));
+            }}
           />
         );
       }
