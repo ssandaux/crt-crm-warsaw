@@ -42,6 +42,11 @@ export default function TrackerPage() {
   const [saving, setSaving] = useState(false);
   const [dragId, setDragId] = useState(null);
   const [dragOver, setDragOver] = useState(null); // column key being hovered
+  const [dragOverTaskId, setDragOverTaskId] = useState(null);
+  const [dragOverPos, setDragOverPos] = useState('below'); // 'above' | 'below'
+  const [colOrders, setColOrders] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('crm_task_orders') ?? '{}'); } catch { return {}; }
+  });
   const [notes, setNotes] = useState('');
   const [notesSaved, setNotesSaved] = useState(true);
   const notesTimer = useRef(null);
@@ -122,6 +127,22 @@ export default function TrackerPage() {
     await supabase.from('tasks').update({ status: newStatus }).eq('id', taskId);
   }
 
+  function getColTasks(colKey) {
+    const raw = tasks.filter((t) => t.status === colKey);
+    const order = colOrders[colKey];
+    if (!order?.length) return raw;
+    const idSet = new Set(raw.map((t) => t.id));
+    const ordered = order.filter((id) => idSet.has(id)).map((id) => raw.find((t) => t.id === id));
+    const remaining = raw.filter((t) => !order.includes(t.id));
+    return [...ordered, ...remaining];
+  }
+
+  function persistOrder(colKey, ids) {
+    const next = { ...colOrders, [colKey]: ids };
+    setColOrders(next);
+    localStorage.setItem('crm_task_orders', JSON.stringify(next));
+  }
+
   // Drag handlers
   function onDragStart(e, taskId) {
     setDragId(taskId);
@@ -136,15 +157,58 @@ export default function TrackerPage() {
 
   function onDrop(e, colKey) {
     e.preventDefault();
-    if (dragId && colKey) moveTask(dragId, colKey);
-    setDragId(null);
+    if (!dragId) { resetDrag(); return; }
+    const dragTask = tasks.find((t) => t.id === dragId);
+    if (dragTask && dragTask.status !== colKey) {
+      moveTask(dragId, colKey);
+      const oldOrder = (colOrders[dragTask.status] ?? getColTasks(dragTask.status).map((t) => t.id)).filter((id) => id !== dragId);
+      persistOrder(dragTask.status, oldOrder);
+    }
+    resetDrag();
+  }
+
+  function onDropOnTask(e, targetTaskId) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!dragId || dragId === targetTaskId) { resetDrag(); return; }
+    const dragTask = tasks.find((t) => t.id === dragId);
+    const targetTask = tasks.find((t) => t.id === targetTaskId);
+    if (!dragTask || !targetTask) { resetDrag(); return; }
+    const colKey = targetTask.status;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const insertBefore = e.clientY < rect.top + rect.height / 2;
+    const colTasks = getColTasks(colKey);
+    let ids = colTasks.map((t) => t.id).filter((id) => id !== dragId);
+    const targetIdx = ids.indexOf(targetTaskId);
+    ids.splice(insertBefore ? targetIdx : targetIdx + 1, 0, dragId);
+    if (dragTask.status !== colKey) {
+      moveTask(dragId, colKey);
+      const oldOrder = (colOrders[dragTask.status] ?? getColTasks(dragTask.status).map((t) => t.id)).filter((id) => id !== dragId);
+      const next = { ...colOrders, [dragTask.status]: oldOrder, [colKey]: ids };
+      setColOrders(next);
+      localStorage.setItem('crm_task_orders', JSON.stringify(next));
+    } else {
+      persistOrder(colKey, ids);
+    }
+    resetDrag();
+  }
+
+  function onTaskDragOver(e, taskId) {
+    e.preventDefault();
+    e.stopPropagation();
+    const rect = e.currentTarget.getBoundingClientRect();
+    setDragOverPos(e.clientY < rect.top + rect.height / 2 ? 'above' : 'below');
+    setDragOverTaskId(taskId);
     setDragOver(null);
   }
 
-  function onDragEnd() {
+  function resetDrag() {
     setDragId(null);
     setDragOver(null);
+    setDragOverTaskId(null);
   }
+
+  function onDragEnd() { resetDrag(); }
 
   const counts = Object.fromEntries(COLUMNS.map((c) => [c.key, tasks.filter((t) => t.status === c.key).length]));
 
@@ -250,7 +314,7 @@ export default function TrackerPage() {
               {/* ── Desktop: horizontal kanban grid ── */}
               <div className="hidden md:grid grid-cols-4 gap-4">
                 {COLUMNS.map((col) => {
-                  const colTasks = tasks.filter((t) => t.status === col.key);
+                  const colTasks = getColTasks(col.key);
                   const isOver = dragOver === col.key;
                   return (
                     <div
@@ -283,14 +347,23 @@ export default function TrackerPage() {
                           const pr = priorityMeta(task.priority);
                           const dl = formatDeadline(task.deadline);
                           const isDragging = dragId === task.id;
+                          const isDropTarget = dragOverTaskId === task.id;
                           return (
                             <div
                               key={task.id}
                               draggable
                               onDragStart={(e) => onDragStart(e, task.id)}
                               onDragEnd={onDragEnd}
+                              onDragOver={(e) => onTaskDragOver(e, task.id)}
+                              onDragLeave={() => setDragOverTaskId(null)}
+                              onDrop={(e) => onDropOnTask(e, task.id)}
                               onClick={() => openEdit(task)}
-                              className={`bg-white rounded-xl border border-gray-200 px-3.5 py-3 shadow-sm cursor-grab active:cursor-grabbing hover:shadow-md hover:border-gray-300 transition-all select-none ${isDragging ? 'opacity-40' : ''}`}
+                              className={`bg-white rounded-xl border px-3.5 py-3 shadow-sm cursor-grab active:cursor-grabbing hover:shadow-md transition-all select-none
+                                ${isDragging ? 'opacity-40' : ''}
+                                ${isDropTarget && dragOverPos === 'above' ? 'border-blue-400 border-t-2' : ''}
+                                ${isDropTarget && dragOverPos === 'below' ? 'border-blue-400 border-b-2' : ''}
+                                ${!isDropTarget ? 'border-gray-200 hover:border-gray-300' : ''}
+                              `}
                             >
                               <div className="flex items-center justify-between mb-2">
                                 <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold ${pr.bg} ${pr.text}`}>
