@@ -10,6 +10,7 @@ const STATUS_COLORS = {
   contacted: '#f59e0b',
   rejected:  '#ef4444',
   untouched: '#9ca3af',
+  verified:  '#7c3aed',
 };
 
 const WARSAW_CENTER = { lat: 52.2297, lng: 21.0122 };

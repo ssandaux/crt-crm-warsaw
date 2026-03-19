@@ -48,7 +48,7 @@ const navGroups = [
         ),
       },
       {
-        label: 'Tasks',
+        label: 'Verification',
         href: '/dashboard/tasks',
         iconBg: '',
         icon: (

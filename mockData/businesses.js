@@ -269,4 +269,4 @@ export const types = [
 ];
 
 export const districts = ['Śródmieście', 'Mokotów', 'Wola', 'Praga-Północ', 'Praga-Południe', 'Ursynów', 'Żoliborz', 'Ochota'];
-export const statuses = ['client', 'agreed', 'contacted', 'rejected', 'untouched'];
+export const statuses = ['client', 'agreed', 'verified', 'contacted', 'rejected', 'untouched'];

@@ -60,12 +60,13 @@ export default function OverviewPage() {
   }
 
   const statCards = [
-    { label: 'Total businesses', count: stats.total,            colorClass: 'text-gray-800',    bg: 'bg-white',      href: '/dashboard/businesses' },
-    { label: 'Untouched',        count: stats.untouched ?? 0,   colorClass: 'text-gray-500',    bg: 'bg-gray-50',    href: null },
-    { label: 'Contacted',        count: stats.contacted ?? 0,   colorClass: 'text-amber-600',   bg: 'bg-amber-50',   href: null },
-    { label: 'Agreed',           count: stats.agreed   ?? 0,    colorClass: 'text-emerald-600', bg: 'bg-emerald-50', href: null },
-    { label: 'Clients',          count: stats.client   ?? 0,    colorClass: 'text-blue-600',    bg: 'bg-blue-50',    href: null },
-    { label: 'Rejected',         count: stats.rejected ?? 0,    colorClass: 'text-red-500',     bg: 'bg-red-50',     href: null },
+    { label: 'Total businesses', count: stats.total,            colorClass: 'text-gray-800',    bg: 'bg-white',       href: '/dashboard/businesses' },
+    { label: 'Untouched',        count: stats.untouched ?? 0,   colorClass: 'text-gray-500',    bg: 'bg-gray-50',     href: null },
+    { label: 'Verified',         count: stats.verified  ?? 0,   colorClass: 'text-violet-600',  bg: 'bg-violet-50',   href: null },
+    { label: 'Contacted',        count: stats.contacted ?? 0,   colorClass: 'text-amber-600',   bg: 'bg-amber-50',    href: null },
+    { label: 'Agreed',           count: stats.agreed   ?? 0,    colorClass: 'text-emerald-600', bg: 'bg-emerald-50',  href: null },
+    { label: 'Clients',          count: stats.client   ?? 0,    colorClass: 'text-blue-600',    bg: 'bg-blue-50',     href: null },
+    { label: 'Rejected',         count: stats.rejected ?? 0,    colorClass: 'text-red-500',     bg: 'bg-red-50',      href: null },
   ];
 
   return (

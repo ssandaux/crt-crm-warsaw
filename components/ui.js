@@ -4,11 +4,12 @@ import { useState, useEffect, useRef } from 'react';
 // ── Status ────────────────────────────────────────────────────────────────────
 
 export const STATUS_CONFIG = {
-  client:    { label: 'Client',    badge: 'bg-blue-50 text-blue-600',       dot: 'bg-blue-500',    ring: 'ring-blue-200',    color: 'bg-blue-500',    active: 'bg-blue-50 text-blue-600 border-blue-200',    text: 'text-blue-600' },
-  agreed:    { label: 'Agreed',    badge: 'bg-emerald-50 text-emerald-600', dot: 'bg-emerald-500', ring: 'ring-emerald-200', color: 'bg-emerald-500', active: 'bg-emerald-50 text-emerald-600 border-emerald-200', text: 'text-emerald-600' },
-  contacted: { label: 'Contacted', badge: 'bg-amber-50 text-amber-600',     dot: 'bg-amber-400',   ring: 'ring-amber-200',   color: 'bg-amber-400',   active: 'bg-amber-50 text-amber-600 border-amber-200',  text: 'text-amber-600' },
-  rejected:  { label: 'Rejected',  badge: 'bg-red-50 text-red-500',         dot: 'bg-red-500',     ring: 'ring-red-200',     color: 'bg-red-500',     active: 'bg-red-50 text-red-500 border-red-200',        text: 'text-red-500' },
-  untouched: { label: 'Untouched', badge: 'bg-gray-100 text-gray-600',       dot: 'bg-gray-400',    ring: 'ring-gray-200',    color: 'bg-gray-400',    active: 'bg-gray-100 text-gray-700 border-gray-300',    text: 'text-gray-500' },
+  client:    { label: 'Client',    badge: 'bg-blue-50 text-blue-600',         dot: 'bg-blue-500',     ring: 'ring-blue-200',     color: 'bg-blue-500',     active: 'bg-blue-50 text-blue-600 border-blue-200',       text: 'text-blue-600'   },
+  agreed:    { label: 'Agreed',    badge: 'bg-emerald-50 text-emerald-600',   dot: 'bg-emerald-500',  ring: 'ring-emerald-200',  color: 'bg-emerald-500',  active: 'bg-emerald-50 text-emerald-600 border-emerald-200', text: 'text-emerald-600' },
+  contacted: { label: 'Contacted', badge: 'bg-amber-50 text-amber-600',       dot: 'bg-amber-400',    ring: 'ring-amber-200',    color: 'bg-amber-400',    active: 'bg-amber-50 text-amber-600 border-amber-200',    text: 'text-amber-600'  },
+  rejected:  { label: 'Rejected',  badge: 'bg-red-50 text-red-500',           dot: 'bg-red-500',      ring: 'ring-red-200',      color: 'bg-red-500',      active: 'bg-red-50 text-red-500 border-red-200',          text: 'text-red-500'    },
+  untouched: { label: 'Untouched', badge: 'bg-gray-100 text-gray-600',        dot: 'bg-gray-400',     ring: 'ring-gray-200',     color: 'bg-gray-400',     active: 'bg-gray-100 text-gray-700 border-gray-300',      text: 'text-gray-500'   },
+  verified:  { label: 'Verified',  badge: 'bg-violet-50 text-violet-600',     dot: 'bg-violet-500',   ring: 'ring-violet-200',   color: 'bg-violet-500',   active: 'bg-violet-50 text-violet-600 border-violet-200', text: 'text-violet-600' },
 };
 
 // Pill badge — map info cards, add form toggle
@@ -84,6 +85,7 @@ const STATUS_DOT_COLORS = {
   contacted: 'bg-amber-400',
   rejected:  'bg-red-500',
   untouched: 'bg-gray-400',
+  verified:  'bg-violet-500',
 };
 const STATUS_OPTION_STYLES = {
   client:    'text-blue-600 hover:bg-blue-50',
@@ -91,6 +93,7 @@ const STATUS_OPTION_STYLES = {
   contacted: 'text-amber-600 hover:bg-amber-50',
   rejected:  'text-red-500 hover:bg-red-50',
   untouched: 'text-gray-600 hover:bg-gray-50',
+  verified:  'text-violet-600 hover:bg-violet-50',
 };
 
 export function StatusSelect({ value, onChange, statuses = [], fullWidth = false }) {

@@ -137,22 +137,22 @@ function ResizableTh({ width, onResize, children, className = '', isLast = false
   );
 }
 
-// ─── Contacted button ──────────────────────────────────────────────────────
-function ContactedButton({ onApprove, animState }) {
-  const confirming = animState === 'contacted';
+// ─── Verified button ───────────────────────────────────────────────────────
+function VerifiedButton({ onApprove, animState }) {
+  const confirming = animState === 'verified';
   return (
     <button
-      onClick={() => onApprove('contacted')}
+      onClick={() => onApprove('verified')}
       disabled={confirming}
       className="inline-flex items-center justify-center gap-1.5 px-3.5 py-[7px] text-[12px] font-medium tracking-wide text-white active:scale-[0.98] leading-none rounded-md whitespace-nowrap select-none"
       style={{
-        backgroundColor: confirming ? '#f59e0b' : '#111827',
+        backgroundColor: confirming ? '#7c3aed' : '#111827',
         transition: 'background-color 200ms ease, transform 100ms ease',
         minWidth: 100,
       }}
     >
       <IconCheck />
-      {confirming ? 'Done!' : 'Contacted'}
+      {confirming ? 'Done!' : 'Verified'}
     </button>
   );
 }
@@ -265,7 +265,7 @@ export default function TasksPage() {
 
   async function handleApprove(biz, status) {
     if (rowAnim[biz.id]) return;
-    setRowAnim((p) => ({ ...p, [biz.id]: 'contacted' }));
+    setRowAnim((p) => ({ ...p, [biz.id]: 'verified' }));
     await new Promise((r) => setTimeout(r, 520));
     setRowAnim((p) => ({ ...p, [biz.id]: 'hiding' }));
     await new Promise((r) => setTimeout(r, 280));
@@ -310,7 +310,7 @@ export default function TasksPage() {
   if (!ready) {
     return (
       <Layout fullWidth>
-        <PageHeader title="Tasks" subtitle="Review untouched businesses." />
+        <PageHeader title="Verification" subtitle="Review untouched businesses." />
         <div className="flex items-center justify-center py-24 text-[13px] text-gray-400">Loading…</div>
       </Layout>
     );
@@ -321,9 +321,9 @@ export default function TasksPage() {
   return (
     <Layout fullWidth>
       <PageHeader
-        title="Tasks"
+        title="Verification"
         count={tasks.length}
-        subtitle="Untouched businesses awaiting your first contact. Approve to move them into Businesses."
+        subtitle="Untouched businesses awaiting verification. Mark as Verified to confirm they meet your criteria."
         action={headerActions}
       />
 
@@ -387,7 +387,7 @@ export default function TasksPage() {
                   )}
                 </div>
                 <div className="flex gap-2 pt-3 border-t border-gray-100">
-                  <ContactedButton animState={anim} onApprove={(s) => handleApprove(biz, s)} />
+                  <VerifiedButton animState={anim} onApprove={(s) => handleApprove(biz, s)} />
                   <button
                     onClick={() => handleSkip(biz)}
                     className="flex-1 min-h-[44px] rounded-lg text-[13px] font-medium text-gray-400 border border-gray-200 hover:text-red-500 hover:border-red-200 hover:bg-red-50 transition-colors"
@@ -536,7 +536,7 @@ export default function TasksPage() {
                           >
                             <IconGoogleMaps />
                           </a>
-                          <ContactedButton
+                          <VerifiedButton
                             animState={anim}
                             onApprove={(status) => handleApprove(biz, status)}
                           />
