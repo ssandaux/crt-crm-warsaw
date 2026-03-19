@@ -258,7 +258,7 @@ export default function TrackerPage() {
                       onDragOver={(e) => onDragOver(e, col.key)}
                       onDrop={(e) => onDrop(e, col.key)}
                       onDragLeave={() => setDragOver(null)}
-                      className={`flex flex-col min-h-[400px] lg:min-h-[calc(100vh-180px)] rounded-2xl border transition-colors ${isOver ? 'border-gray-400 bg-gray-50' : 'border-gray-200 bg-gray-50/60'}`}
+                      className={`flex flex-col min-h-[300px] lg:h-[calc(100vh-180px)] rounded-2xl border transition-colors ${isOver ? 'border-gray-400 bg-gray-50' : 'border-gray-200 bg-gray-50/60'}`}
                     >
                       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
                         <div className="flex items-center gap-2">
@@ -319,7 +319,7 @@ export default function TrackerPage() {
         </div>
 
         {/* Notes panel */}
-        <div className="w-full lg:w-72 lg:shrink-0 flex flex-col bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden mb-4 lg:mb-0 h-[272px] lg:h-[calc(100vh-180px)]">
+        <div className="w-full lg:w-72 lg:shrink-0 flex flex-col bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden mb-4 lg:mb-0 h-[272px] lg:h-[calc(100vh-180px)] lg:overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 shrink-0">
             <div className="flex items-center gap-2">
               <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
