@@ -108,7 +108,7 @@ export default function FollowUpsPage() {
   }
 
   return (
-    <Layout>
+    <Layout fullWidth>
       <PageHeader
         title="Reminders"
         count={items.length}
