@@ -26,6 +26,10 @@ const PAGE_SIZES = [10, 25, 50, 100];
 const COL_WIDTHS_KEY = 'crm_biz_col_widths';
 const DEFAULT_COL_WIDTHS = { name: 260, status: 150, type: 140, email: 180, lastAction: 140, followUpDate: 120, note: 180, actions: 130 };
 
+const COL_VISIBILITY_KEY = 'crm_biz_col_hidden';
+// Columns that cannot be hidden
+const ALWAYS_VISIBLE = new Set(['name', 'actions']);
+
 function ResizableTh({ colKey, width, onResize, children, className = '', isLast = false }) {
   const startX = useRef(null);
   const startW = useRef(null);
@@ -200,6 +204,27 @@ export default function BusinessesPage() {
   const [deleteBiz, setDeleteBiz]         = useState(null);
   const [profileBiz, setProfileBiz]       = useState(null);
   const [bulkStatusMenu, setBulkStatusMenu] = useState(false);
+  const [colVisMenu, setColVisMenu]         = useState(false);
+  const colVisRef                           = useRef(null);
+  const [hiddenCols, setHiddenCols]         = useState(() => {
+    try { return new Set(JSON.parse(localStorage.getItem(COL_VISIBILITY_KEY) ?? '[]')); } catch { return new Set(); }
+  });
+  function toggleColVisibility(key) {
+    if (ALWAYS_VISIBLE.has(key)) return;
+    setHiddenCols((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key); else next.add(key);
+      try { localStorage.setItem(COL_VISIBILITY_KEY, JSON.stringify([...next])); } catch {}
+      return next;
+    });
+  }
+  useEffect(() => {
+    if (!colVisMenu) return;
+    function handler(e) { if (colVisRef.current && !colVisRef.current.contains(e.target)) setColVisMenu(false); }
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [colVisMenu]);
+
   const [enriching, setEnriching]           = useState(false);
   const [enrichProgress, setEnrichProgress] = useState(null);
   const [enrichDone, setEnrichDone]         = useState(null);
@@ -459,6 +484,41 @@ export default function BusinessesPage() {
             Clear
           </button>
         )}
+
+        {/* Column visibility — desktop only */}
+        <div className="hidden sm:block relative ml-auto" ref={colVisRef}>
+          <button
+            onClick={() => setColVisMenu((v) => !v)}
+            className={`inline-flex items-center gap-1.5 px-3 py-[7px] rounded-lg border text-[12px] font-medium transition-colors ${colVisMenu ? 'bg-gray-100 border-gray-300 text-gray-800' : 'bg-white border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-700'}`}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
+            </svg>
+            Columns
+            {hiddenCols.size > 0 && (
+              <span className="bg-gray-800 text-white text-[10px] font-semibold px-1.5 py-0.5 rounded-full leading-none">{hiddenCols.size}</span>
+            )}
+          </button>
+          {colVisMenu && (
+            <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden min-w-[160px] py-1">
+              {COLUMNS.filter((c) => !ALWAYS_VISIBLE.has(c.key)).map((col) => {
+                const visible = !hiddenCols.has(col.key);
+                return (
+                  <button
+                    key={col.key}
+                    onClick={() => toggleColVisibility(col.key)}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 text-[12px] text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    <span className={`w-3.5 h-3.5 rounded border flex items-center justify-center shrink-0 transition-colors ${visible ? 'bg-gray-900 border-gray-900' : 'border-gray-300'}`}>
+                      {visible && <svg xmlns="http://www.w3.org/2000/svg" className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
+                    </span>
+                    {col.label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Table */}
@@ -525,16 +585,20 @@ export default function BusinessesPage() {
         {/* Desktop table */}
         <div className="hidden md:block bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
-          <table className="text-[13px] border-collapse" style={{ tableLayout: 'fixed', width: 40 + Object.values(colWidths).reduce((a,b)=>a+b,0), minWidth: '100%' }}>
+          {(() => {
+            const visCols = COLUMNS.filter((c) => !hiddenCols.has(c.key));
+            const totalW = 40 + visCols.reduce((a, c) => a + (colWidths[c.key] ?? 120), 0);
+            return (
+          <table className="text-[13px] border-collapse" style={{ tableLayout: 'fixed', width: totalW, minWidth: '100%' }}>
             <colgroup>
               <col style={{ width: 40 }} />
-              {COLUMNS.map((col) => <col key={col.key} style={{ width: colWidths[col.key] }} />)}
+              {visCols.map((col) => <col key={col.key} style={{ width: colWidths[col.key] }} />)}
             </colgroup>
             <thead>
               <tr>
                 <th className="w-10 pl-4 pr-2 py-3 bg-gray-50/60 border-b border-gray-100" />
-                {COLUMNS.map((col, i) => (
-                  <ResizableTh key={col.key} colKey={col.key} width={colWidths[col.key]} onResize={(w) => setColWidth(col.key, w)} isLast={i === COLUMNS.length - 1} className={col.center ? 'text-center' : ''}>
+                {visCols.map((col, i) => (
+                  <ResizableTh key={col.key} colKey={col.key} width={colWidths[col.key]} onResize={(w) => setColWidth(col.key, w)} isLast={i === visCols.length - 1} className={col.center ? 'text-center' : ''}>
                     <span className={`inline-flex items-center gap-1 ${col.center ? 'justify-center w-full' : ''} ${!col.noSort ? 'cursor-pointer hover:text-gray-700' : ''}`} onClick={() => !col.noSort && handleSort(col.key)}>
                       {col.label}
                       {!col.noSort && <SortIcon active={sortKey === col.key} dir={sortDir} />}
@@ -545,7 +609,7 @@ export default function BusinessesPage() {
             </thead>
             <tbody className="divide-y divide-gray-50">
               {pageRows.length === 0 ? (
-                <tr><td colSpan={9} className="px-4 py-16 text-center text-[13px] text-gray-400">No businesses match your filters.</td></tr>
+                <tr><td colSpan={visCols.length + 1} className="px-4 py-16 text-center text-[13px] text-gray-400">No businesses match your filters.</td></tr>
               ) : pageRows.map((biz) => (
                 <tr key={biz.id} className={`hover:bg-gray-50/70 transition-colors group ${selected.has(biz.id) ? 'bg-gray-50' : ''}`}>
                   <td className="w-10 pl-4 pr-2 py-3">
@@ -553,30 +617,36 @@ export default function BusinessesPage() {
                       className="w-3.5 h-3.5 rounded border-gray-300 accent-gray-800 cursor-pointer" />
                   </td>
                   <td className="px-4 py-3"><button onClick={() => setProfileBiz(biz)} className="font-semibold text-gray-900 hover:text-gray-600 text-left transition-colors">{biz.name}</button></td>
-                  <td className="px-4 py-3"><InlineStatusSelect biz={biz} onChange={changeStatus} /></td>
-                  <td className="px-4 py-3 overflow-hidden">
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium bg-gray-100 text-gray-600 truncate max-w-full">
-                      {biz.type || '—'}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-gray-400 text-[12px]">{biz.email}</td>
-                  <td className="px-4 py-3 text-gray-400 text-[12px] whitespace-nowrap">
-                    {new Date(biz.lastAction).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
-                  </td>
-                  <td className="px-4 py-3 text-[12px] whitespace-nowrap">
-                    {biz.followUpDate ? (() => {
-                      const today = biz.followUpDate === new Date().toISOString().split('T')[0];
-                      const overdue = new Date(biz.followUpDate) < new Date(new Date().toDateString());
-                      const isUrgent = today || overdue;
-                      return (
-                        <span className={isUrgent ? 'text-red-500 font-medium' : 'text-gray-400'}>
-                          {new Date(biz.followUpDate + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
-                          {isUrgent && ' ·'}
-                        </span>
-                      );
-                    })() : <span className="text-gray-200">—</span>}
-                  </td>
-                  <td className="px-4 py-3 text-gray-400 text-[12px] max-w-[140px] truncate">{biz.note}</td>
+                  {!hiddenCols.has('status') && <td className="px-4 py-3"><InlineStatusSelect biz={biz} onChange={changeStatus} /></td>}
+                  {!hiddenCols.has('type') && (
+                    <td className="px-4 py-3 overflow-hidden">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium bg-gray-100 text-gray-600 truncate max-w-full">
+                        {biz.type || '—'}
+                      </span>
+                    </td>
+                  )}
+                  {!hiddenCols.has('contact') && <td className="px-4 py-3 text-gray-400 text-[12px]">{biz.email}</td>}
+                  {!hiddenCols.has('lastAction') && (
+                    <td className="px-4 py-3 text-gray-400 text-[12px] whitespace-nowrap">
+                      {new Date(biz.lastAction).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    </td>
+                  )}
+                  {!hiddenCols.has('followUpDate') && (
+                    <td className="px-4 py-3 text-[12px] whitespace-nowrap">
+                      {biz.followUpDate ? (() => {
+                        const today = biz.followUpDate === new Date().toISOString().split('T')[0];
+                        const overdue = new Date(biz.followUpDate) < new Date(new Date().toDateString());
+                        const isUrgent = today || overdue;
+                        return (
+                          <span className={isUrgent ? 'text-red-500 font-medium' : 'text-gray-400'}>
+                            {new Date(biz.followUpDate + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                            {isUrgent && ' ·'}
+                          </span>
+                        );
+                      })() : <span className="text-gray-200">—</span>}
+                    </td>
+                  )}
+                  {!hiddenCols.has('note') && <td className="px-4 py-3 text-gray-400 text-[12px] max-w-[140px] truncate">{biz.note}</td>}
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-center gap-3">
                       <button onClick={() => handleEdit(biz)} className="inline-flex items-center gap-1 text-[12px] text-gray-400 hover:text-gray-800 transition-colors font-medium">
@@ -591,6 +661,8 @@ export default function BusinessesPage() {
               ))}
             </tbody>
           </table>
+          );
+          })()}
           </div>
 
           <div className="px-4 py-3 border-t border-gray-100 bg-gray-50/40 flex items-center justify-between">
