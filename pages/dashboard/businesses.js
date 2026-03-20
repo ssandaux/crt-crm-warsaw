@@ -19,10 +19,6 @@ const COLUMNS = [
   { key: 'actions',    label: 'Actions', noSort: true },
 ];
 
-const VIEW_TABS = [
-  { key: 'table', label: 'Table', icon: <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M3 6h18M3 14h18M3 18h18" /></svg> },
-  { key: 'board', label: 'Board', icon: <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7" /></svg> },
-];
 
 const PAGE_SIZES = [10, 25, 50, 100];
 
@@ -189,7 +185,6 @@ export default function BusinessesPage() {
   const [filterDistrict, setFilterDistrict] = useState('');
   const [sortKey, setSortKey]             = useState('name');
   const [sortDir, setSortDir]             = useState('asc');
-  const [activeView, setActiveView]       = useState('table');
   const [page, setPage]                   = useState(1);
   const [colWidths, setColWidths] = useState(() => {
     try { return { ...DEFAULT_COL_WIDTHS, ...JSON.parse(localStorage.getItem(COL_WIDTHS_KEY) ?? '{}') }; } catch { return DEFAULT_COL_WIDTHS; }
@@ -373,65 +368,40 @@ export default function BusinessesPage() {
         </div>
       )}
 
-      {/* View tabs + filters */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
-        <div className="hidden sm:flex items-center gap-0.5 bg-gray-100 rounded-lg p-1 self-start">
-          {VIEW_TABS.map((tab) => (
-            <button key={tab.key} onClick={() => setActiveView(tab.key)}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[12px] font-medium transition-all ${activeView === tab.key ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>
-              {tab.icon}{tab.label}
-            </button>
-          ))}
+      {/* Filters */}
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center mb-4">
+        {/* Search */}
+        <div className="relative w-full sm:w-auto sm:flex-none">
+          <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+          <input type="text" placeholder="Search..." value={search}
+            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+            className="w-full sm:w-48 pl-8 pr-3 py-[7px] text-[13px] text-gray-700 bg-white border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent placeholder-gray-400 transition hover:border-gray-300" />
         </div>
 
-        {/* Mobile: search full-width, then 3 dropdowns in a row below */}
-        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2 sm:flex-1 sm:justify-end">
-          {/* Search — full width on mobile */}
-          <div className="relative w-full sm:w-auto sm:flex-none">
-            <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-            <input type="text" placeholder="Search..." value={search}
-              onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-              className="w-full sm:w-48 pl-8 pr-3 py-[7px] text-[13px] text-gray-700 bg-white border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent placeholder-gray-400 transition hover:border-gray-300" />
-          </div>
-
-          {/* 3 dropdowns — equal width row on mobile, natural on desktop */}
-          <div className="grid grid-cols-3 gap-2 w-full sm:w-auto sm:flex sm:flex-wrap sm:items-center">
-            <StatusSelect
-              value={filterStatus}
-              onChange={(v) => { setFilterStatus(v); setPage(1); }}
-              statuses={statuses}
-              fullWidth
-            />
-            <select value={filterType} onChange={(e) => { setFilterType(e.target.value); setPage(1); }} className={`w-full sm:w-auto ${selectCls}`}>
-              <option value="">All types</option>
-              {types.map((t) => <option key={t} value={t}>{t}</option>)}
-            </select>
-            <select value={filterDistrict} onChange={(e) => { setFilterDistrict(e.target.value); setPage(1); }} className={`w-full sm:w-auto ${selectCls}`}>
-              <option value="">All districts</option>
-              {districts.map((d) => <option key={d} value={d}>{d}</option>)}
-            </select>
-          </div>
-
-          {hasFilters && (
-            <button onClick={() => { setSearch(''); setFilterStatus(''); setFilterType(''); setFilterDistrict(''); setPage(1); }}
-              className="text-[12px] text-gray-400 hover:text-gray-700 flex items-center gap-1 transition-colors self-start sm:self-auto">
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-              Clear
-            </button>
-          )}
+        {/* Dropdowns */}
+        <div className="grid grid-cols-3 gap-2 w-full sm:w-auto sm:flex sm:items-center sm:gap-2">
+          <StatusSelect value={filterStatus} onChange={(v) => { setFilterStatus(v); setPage(1); }} statuses={statuses} fullWidth />
+          <select value={filterType} onChange={(e) => { setFilterType(e.target.value); setPage(1); }} className={`w-full sm:w-auto ${selectCls}`}>
+            <option value="">All types</option>
+            {types.map((t) => <option key={t} value={t}>{t}</option>)}
+          </select>
+          <select value={filterDistrict} onChange={(e) => { setFilterDistrict(e.target.value); setPage(1); }} className={`w-full sm:w-auto ${selectCls}`}>
+            <option value="">All districts</option>
+            {districts.map((d) => <option key={d} value={d}>{d}</option>)}
+          </select>
         </div>
+
+        {hasFilters && (
+          <button onClick={() => { setSearch(''); setFilterStatus(''); setFilterType(''); setFilterDistrict(''); setPage(1); }}
+            className="text-[12px] text-gray-400 hover:text-gray-700 flex items-center gap-1 transition-colors self-start sm:self-auto">
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            Clear
+          </button>
+        )}
       </div>
 
-      {/* Board view — desktop only */}
-      {activeView === 'board' && (
-        <div className="hidden sm:block">
-          <BoardView businesses={filtered} onEdit={handleEdit} onDelete={handleDelete} onStatusChange={changeStatus} onProfile={setProfileBiz} />
-        </div>
-      )}
-
-      {/* Table view — always on mobile; on desktop only when activeView === 'table' */}
-      {(activeView === 'table' || activeView === 'board') && (
-        <div className={activeView === 'board' ? 'sm:hidden' : undefined}>
+      {/* Table */}
+      <div>
         <>
         {/* Mobile cards */}
         <div className="md:hidden space-y-3">
@@ -600,7 +570,6 @@ export default function BusinessesPage() {
         </div>
         </>
         </div>
-      )}
     </Layout>
   );
 }
