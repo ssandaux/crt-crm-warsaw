@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useEffect } from 'react';
+import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import Layout from '../../components/Layout';
 import AddBusinessModal from '../../components/AddBusinessModal';
 import PageHeader from '../../components/PageHeader';
@@ -25,6 +25,33 @@ const VIEW_TABS = [
 ];
 
 const PAGE_SIZES = [10, 25, 50, 100];
+
+const COL_WIDTHS_KEY = 'crm_biz_col_widths';
+const DEFAULT_COL_WIDTHS = { name: 260, status: 150, type: 140, email: 180, lastAction: 140, followUpDate: 120, note: 180, actions: 130 };
+
+function ResizableTh({ colKey, width, onResize, children, className = '', isLast = false }) {
+  const startX = useRef(null);
+  const startW = useRef(null);
+  const onMouseDown = useCallback((e) => {
+    e.preventDefault();
+    startX.current = e.clientX;
+    startW.current = width;
+    function onMove(ev) { onResize(Math.max(60, startW.current + ev.clientX - startX.current)); }
+    function onUp() { document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); }
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  }, [width, onResize]);
+  return (
+    <th style={{ width, minWidth: width }} className={`relative text-left px-4 py-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider bg-gray-50/60 border-b border-gray-100 select-none ${className}`}>
+      {children}
+      {!isLast && (
+        <div onMouseDown={onMouseDown} className="absolute right-0 top-0 h-full w-4 flex items-center justify-center cursor-col-resize group z-10">
+          <div className="w-[3px] h-5 rounded-full bg-gray-200 group-hover:bg-gray-400 transition-colors" />
+        </div>
+      )}
+    </th>
+  );
+}
 const EMPTY_FORM = { name: '', type: '', district: '', address: '', phone: '', email: '', status: 'contacted', note: '' };
 
 function SortIcon({ active, dir }) {
@@ -164,6 +191,12 @@ export default function BusinessesPage() {
   const [sortDir, setSortDir]             = useState('asc');
   const [activeView, setActiveView]       = useState('table');
   const [page, setPage]                   = useState(1);
+  const [colWidths, setColWidths] = useState(() => {
+    try { return { ...DEFAULT_COL_WIDTHS, ...JSON.parse(localStorage.getItem(COL_WIDTHS_KEY) ?? '{}') }; } catch { return DEFAULT_COL_WIDTHS; }
+  });
+  function setColWidth(col, w) {
+    setColWidths((prev) => { const next = { ...prev, [col]: w }; localStorage.setItem(COL_WIDTHS_KEY, JSON.stringify(next)); return next; });
+  }
   const [pageSize, setPageSize]           = useState(25);
   const [selected, setSelected]           = useState(new Set());
   const [showAddModal, setShowAddModal]   = useState(false);
@@ -460,21 +493,22 @@ export default function BusinessesPage() {
 
         {/* Desktop table */}
         <div className="hidden md:block bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
-          <table className="w-full text-[13px]">
+          <div className="overflow-x-auto">
+          <table className="text-[13px] border-collapse" style={{ tableLayout: 'fixed', width: 40 + Object.values(colWidths).reduce((a,b)=>a+b,0), minWidth: '100%' }}>
+            <colgroup>
+              <col style={{ width: 40 }} />
+              {COLUMNS.map((col) => <col key={col.key} style={{ width: colWidths[col.key] }} />)}
+            </colgroup>
             <thead>
-              <tr className="border-b border-gray-100 bg-gray-50/60">
-                <th className="w-10 pl-4 pr-2 py-3">
-                  <input type="checkbox" checked={allOnPageSelected} onChange={toggleAll}
-                    className="w-3.5 h-3.5 rounded border-gray-300 accent-gray-800 cursor-pointer" />
-                </th>
-                {COLUMNS.map((col) => (
-                  <th key={col.key} onClick={() => !col.noSort && handleSort(col.key)}
-                    className={`text-left px-4 py-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap ${!col.noSort ? 'cursor-pointer hover:text-gray-700 select-none' : ''}`}>
-                    <span className="inline-flex items-center">
+              <tr>
+                <th className="w-10 pl-4 pr-2 py-3 bg-gray-50/60 border-b border-gray-100" />
+                {COLUMNS.map((col, i) => (
+                  <ResizableTh key={col.key} colKey={col.key} width={colWidths[col.key]} onResize={(w) => setColWidth(col.key, w)} isLast={i === COLUMNS.length - 1}>
+                    <span className={`inline-flex items-center gap-1 ${!col.noSort ? 'cursor-pointer hover:text-gray-700' : ''}`} onClick={() => !col.noSort && handleSort(col.key)}>
                       {col.label}
                       {!col.noSort && <SortIcon active={sortKey === col.key} dir={sortDir} />}
                     </span>
-                  </th>
+                  </ResizableTh>
                 ))}
               </tr>
             </thead>
@@ -522,6 +556,7 @@ export default function BusinessesPage() {
               ))}
             </tbody>
           </table>
+          </div>
 
           <div className="px-4 py-3 border-t border-gray-100 bg-gray-50/40 flex items-center justify-between">
             <div className="flex items-center gap-3">
