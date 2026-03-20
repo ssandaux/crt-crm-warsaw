@@ -10,21 +10,23 @@ import { EditModal, DeleteConfirm } from '../../components/BusinessModals';
 import { enrichEmails } from '../../lib/enrichEmails';
 
 const COLUMNS = [
-  { key: 'name',       label: 'Business' },
-  { key: 'status',     label: 'Status' },
-  { key: 'type',       label: 'Category' },
-  { key: 'contact',    label: 'Email' },
+  { key: 'name',        label: 'Business' },
+  { key: 'status',      label: 'Status' },
+  { key: 'type',        label: 'Category' },
+  { key: 'contact',     label: 'Email', noSort: true },
+  { key: 'phone',       label: 'Phone', noSort: true },
+  { key: 'website',     label: 'Website', noSort: true },
   { key: 'lastAction',  label: 'Last action' },
   { key: 'followUpDate', label: 'Reminder' },
   { key: 'note',        label: 'Note', noSort: true },
-  { key: 'actions',    label: 'Actions', noSort: true, center: true },
+  { key: 'actions',     label: 'Actions', noSort: true, center: true },
 ];
 
 
 const PAGE_SIZES = [10, 25, 50, 100];
 
 const COL_WIDTHS_KEY = 'crm_biz_col_widths';
-const DEFAULT_COL_WIDTHS = { name: 260, status: 150, type: 140, email: 180, lastAction: 140, followUpDate: 120, note: 180, actions: 130 };
+const DEFAULT_COL_WIDTHS = { name: 260, status: 150, type: 140, email: 180, phone: 150, website: 180, lastAction: 140, followUpDate: 120, note: 180, actions: 130 };
 
 const COL_VISIBILITY_KEY = 'crm_biz_col_hidden';
 // Columns that cannot be hidden
@@ -626,6 +628,22 @@ export default function BusinessesPage() {
                     </td>
                   )}
                   {!hiddenCols.has('contact') && <td className="px-4 py-3 text-gray-400 text-[12px]">{biz.email}</td>}
+                  {!hiddenCols.has('phone') && (
+                    <td className="px-4 py-3 text-gray-400 text-[12px] whitespace-nowrap">
+                      {biz.phone && biz.phone !== '—'
+                        ? <a href={`tel:${biz.phone}`} className="hover:text-gray-700 transition-colors">{biz.phone}</a>
+                        : <span className="text-gray-200">—</span>}
+                    </td>
+                  )}
+                  {!hiddenCols.has('website') && (
+                    <td className="px-4 py-3 text-[12px] max-w-[160px] truncate">
+                      {biz.website && biz.website !== '—'
+                        ? <a href={biz.website.startsWith('http') ? biz.website : `https://${biz.website}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-700 transition-colors truncate block">
+                            {biz.website.replace(/^https?:\/\/(www\.)?/, '')}
+                          </a>
+                        : <span className="text-gray-200">—</span>}
+                    </td>
+                  )}
                   {!hiddenCols.has('lastAction') && (
                     <td className="px-4 py-3 text-gray-400 text-[12px] whitespace-nowrap">
                       {new Date(biz.lastAction).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
