@@ -4,6 +4,7 @@ import { useJsApiLoader } from '@react-google-maps/api';
 import Layout from '../../components/Layout';
 import { useData } from '../../components/DataContext';
 import { importFromGoogle, getImportWaveInfo, TOTAL_WAVES } from '../../lib/importGoogle';
+import { enrichEmails } from '../../lib/enrichEmails';
 
 const LIBRARIES = ['places'];
 
@@ -29,6 +30,10 @@ export default function OverviewPage() {
   const [importProgress, setImportProgress] = useState(null);
   const [importDone, setImportDone]         = useState(null);
 
+  const [enriching, setEnriching]           = useState(false);
+  const [enrichProgress, setEnrichProgress] = useState(null);  // { done, total, found }
+  const [enrichDone, setEnrichDone]         = useState(null);  // { updated, total }
+
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
@@ -43,6 +48,18 @@ export default function OverviewPage() {
     }
     return { total, ...byStatus };
   }, [businesses]);
+
+  async function handleEnrichEmails() {
+    setEnriching(true);
+    setEnrichDone(null);
+    setEnrichProgress(null);
+    try {
+      const result = await enrichEmails((p) => setEnrichProgress(p));
+      setEnrichDone(result);
+    } finally {
+      setEnriching(false);
+    }
+  }
 
   async function handleGoogleImport() {
     if (!hiddenDivRef.current) return;
@@ -142,6 +159,49 @@ export default function OverviewPage() {
         </div>
       )}
 
+      {/* Enrich emails progress modal */}
+      {enriching && (
+        <div className="fixed inset-0 z-[3000] flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 w-full max-w-sm mx-4 p-6">
+            <p className="text-[14px] font-bold text-gray-900 mb-1">Fetching email addresses</p>
+            <p className="text-[12px] text-gray-400 mb-5">Scanning business websites. Takes a few minutes.</p>
+            {enrichProgress && (
+              <div className="space-y-4">
+                <div>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <p className="text-[12px] font-medium text-gray-700">Processed</p>
+                    <p className="text-[11px] text-gray-400">{enrichProgress.done} / {enrichProgress.total}</p>
+                  </div>
+                  <div className="w-full bg-gray-100 rounded-full h-1.5">
+                    <div
+                      className="bg-gray-900 h-1.5 rounded-full transition-all duration-300"
+                      style={{ width: `${(enrichProgress.done / enrichProgress.total) * 100}%` }}
+                    />
+                  </div>
+                </div>
+                <p className="text-[12px] text-gray-500 pt-2 border-t border-gray-100">
+                  Emails found: <span className="font-semibold text-gray-900">{enrichProgress.found}</span>
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Enrich done banner */}
+      {enrichDone && (
+        <div className="mb-4 px-4 py-3 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-between gap-3">
+          <p className="text-[13px] text-blue-700 font-medium">
+            Done — {enrichDone.updated} email addresses found out of {enrichDone.total} businesses scanned
+          </p>
+          <button onClick={() => setEnrichDone(null)} className="text-blue-400 hover:text-blue-700 transition-colors shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      )}
+
       {/* Import done banner */}
       {importDone && (
         <div className="mb-4 px-4 py-3 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between gap-3">
@@ -190,8 +250,23 @@ export default function OverviewPage() {
         </svg>
         Import from Google
       </button>
-      <p className="text-[11px] text-gray-400 text-center mb-6">
+      <p className="text-[11px] text-gray-400 text-center mb-3">
         Up to 1,000 new businesses per import · Total database limit: 10,000
+      </p>
+
+      {/* Enrich emails button */}
+      <button
+        onClick={handleEnrichEmails}
+        disabled={enriching || importing}
+        className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-[14px] font-medium border border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:text-gray-800 transition-all disabled:opacity-50 mb-2"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+        Enrich Email Addresses
+      </button>
+      <p className="text-[11px] text-gray-400 text-center mb-6">
+        Scans business websites to extract email addresses
       </p>
     </Layout>
   );
