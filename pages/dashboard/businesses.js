@@ -16,7 +16,7 @@ const COLUMNS = [
   { key: 'lastAction',  label: 'Last action' },
   { key: 'followUpDate', label: 'Reminder' },
   { key: 'note',        label: 'Note', noSort: true },
-  { key: 'actions',    label: 'Actions', noSort: true },
+  { key: 'actions',    label: 'Actions', noSort: true, center: true },
 ];
 
 
@@ -473,8 +473,8 @@ export default function BusinessesPage() {
               <tr>
                 <th className="w-10 pl-4 pr-2 py-3 bg-gray-50/60 border-b border-gray-100" />
                 {COLUMNS.map((col, i) => (
-                  <ResizableTh key={col.key} colKey={col.key} width={colWidths[col.key]} onResize={(w) => setColWidth(col.key, w)} isLast={i === COLUMNS.length - 1}>
-                    <span className={`inline-flex items-center gap-1 ${!col.noSort ? 'cursor-pointer hover:text-gray-700' : ''}`} onClick={() => !col.noSort && handleSort(col.key)}>
+                  <ResizableTh key={col.key} colKey={col.key} width={colWidths[col.key]} onResize={(w) => setColWidth(col.key, w)} isLast={i === COLUMNS.length - 1} className={col.center ? 'text-center' : ''}>
+                    <span className={`inline-flex items-center gap-1 ${col.center ? 'justify-center w-full' : ''} ${!col.noSort ? 'cursor-pointer hover:text-gray-700' : ''}`} onClick={() => !col.noSort && handleSort(col.key)}>
                       {col.label}
                       {!col.noSort && <SortIcon active={sortKey === col.key} dir={sortDir} />}
                     </span>
@@ -513,7 +513,7 @@ export default function BusinessesPage() {
                   </td>
                   <td className="px-4 py-3 text-gray-400 text-[12px] max-w-[140px] truncate">{biz.note}</td>
                   <td className="px-4 py-3">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-center gap-3">
                       <button onClick={() => handleEdit(biz)} className="inline-flex items-center gap-1 text-[12px] text-gray-400 hover:text-gray-800 transition-colors font-medium">
                         <IconEdit /> Edit
                       </button>
