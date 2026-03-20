@@ -11,7 +11,7 @@ import { EditModal, DeleteConfirm } from '../../components/BusinessModals';
 const COLUMNS = [
   { key: 'name',       label: 'Business' },
   { key: 'status',     label: 'Status' },
-  { key: 'type',       label: 'Type' },
+  { key: 'type',       label: 'Category' },
   { key: 'contact',    label: 'Email' },
   { key: 'lastAction',  label: 'Last action' },
   { key: 'followUpDate', label: 'Reminder' },
@@ -493,7 +493,11 @@ export default function BusinessesPage() {
                   </td>
                   <td className="px-4 py-3"><button onClick={() => setProfileBiz(biz)} className="font-semibold text-gray-900 hover:text-gray-600 text-left transition-colors">{biz.name}</button></td>
                   <td className="px-4 py-3"><InlineStatusSelect biz={biz} onChange={changeStatus} /></td>
-                  <td className="px-4 py-3 text-gray-500">{biz.type}</td>
+                  <td className="px-4 py-3 overflow-hidden">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium bg-gray-100 text-gray-600 truncate max-w-full">
+                      {biz.type || '—'}
+                    </span>
+                  </td>
                   <td className="px-4 py-3 text-gray-400 text-[12px]">{biz.email}</td>
                   <td className="px-4 py-3 text-gray-400 text-[12px] whitespace-nowrap">
                     {new Date(biz.lastAction).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
