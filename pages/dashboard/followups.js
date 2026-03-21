@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import Layout from '../../components/Layout';
 import PageHeader from '../../components/PageHeader';
@@ -20,7 +20,14 @@ function isToday(iso) {
 }
 
 export default function FollowUpsPage() {
-  const { businesses } = useData();
+  const { businesses, updateBusiness } = useData();
+  const [deletingId, setDeletingId] = useState(null);
+
+  async function handleDelete(id) {
+    setDeletingId(id);
+    await updateBusiness(id, { followUpDate: null });
+    setDeletingId(null);
+  }
 
   const items = useMemo(() => {
     return businesses
@@ -94,11 +101,30 @@ export default function FollowUpsPage() {
                   </div>
                 </div>
 
-                {/* Date */}
-                <span className={`text-[12px] font-semibold shrink-0 mt-0.5 ${overdueBiz || todayBiz ? 'text-red-500' : 'text-gray-500'}`}>
-                  {(overdueBiz || todayBiz) && <span className="mr-1">⚠</span>}
-                  {fmt(biz.followUpDate)}
-                </span>
+                {/* Date + delete */}
+                <div className="flex items-center gap-2 shrink-0 mt-0.5">
+                  <span className={`text-[12px] font-semibold ${overdueBiz || todayBiz ? 'text-red-500' : 'text-gray-500'}`}>
+                    {(overdueBiz || todayBiz) && <span className="mr-1">⚠</span>}
+                    {fmt(biz.followUpDate)}
+                  </span>
+                  <button
+                    onClick={() => handleDelete(biz.id)}
+                    disabled={deletingId === biz.id}
+                    className="p-1 rounded-md text-gray-300 hover:text-red-400 hover:bg-red-50 transition-colors disabled:opacity-40"
+                    title="Remove reminder"
+                  >
+                    {deletingId === biz.id ? (
+                      <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                      </svg>
+                    ) : (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
               </div>
             );
           })}
